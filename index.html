@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>الصفحة الرئيسية</title>
+  <title>حجز موعد</title>
   <style>
     body {
       background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
@@ -104,8 +104,9 @@
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
 
-      // Disable the submit button while loading
-      document.getElementById("submit-button").disabled = true;
+      // تعطيل الزر أثناء تحميل الأوقات
+      const submitButton = document.getElementById("submit-button");
+      submitButton.disabled = true;
 
       try {
         const response = await fetch(`${apiUrl}?action=getClosedAndBooked`);
@@ -114,7 +115,7 @@
         const bookedTimes = data.booked || [];
 
         const timeSelect = document.getElementById("time");
-        timeSelect.innerHTML = ""; // Clear previous options
+        timeSelect.innerHTML = ""; // مسح الخيارات السابقة
 
         const availableTimes = workingHours.filter(time => {
           const [hourStr, minuteStr] = time.split(":");
@@ -139,13 +140,14 @@
           });
         }
 
-        // Enable the submit button after loading times
-        document.getElementById("submit-button").disabled = false;
+        // تمكين الزر بعد تحميل الأوقات
+        submitButton.disabled = false;
 
       } catch (error) {
         console.error("Error loading times:", error);
         document.getElementById("response-message").innerText = "⚠️ فشل تحميل الأوقات. حاول مجددًا.";
-        document.getElementById("submit-button").disabled = false;
+        // تمكين الزر في حالة الفشل
+        submitButton.disabled = false;
       }
     }
 
@@ -154,7 +156,7 @@
         .then(response => response.json())
         .then(data => {
           document.getElementById("response-message").innerText = "✅ تم حجز الموعد بنجاح!";
-          loadAvailableTimes(); // Reload available times after booking
+          loadAvailableTimes(); // إعادة تحميل الأوقات بعد الحجز
         })
         .catch(error => {
           console.error("Error booking appointment:", error);
@@ -169,7 +171,7 @@
       bookAppointment(name, time);
     });
 
-    loadAvailableTimes(); // Call it initially when the page loads
+    loadAvailableTimes(); // استدعاء تحميل الأوقات عند تحميل الصفحة
   </script>
 
 </body>
