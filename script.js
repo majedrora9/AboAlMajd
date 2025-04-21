@@ -116,16 +116,10 @@ bookButton.addEventListener('click', async () => {
             body: `action=bookTime&userName=${encodeURIComponent(userName)}&bookingTime=${encodeURIComponent(bookingTime12)}`, // تم التغيير إلى bookingTime12
         });
         const data = await response.json();
-
         if (data.success) {
             bookingStatus.textContent = data.message;
             bookingStatus.className = 'message success';
-            // إعادة تحميل الأوقات المتاحة بعد الحجز
-            fetchAvailableTimes();
-            // مسح حقول الإدخال
-            usernameInput.value = '';
-            timeSlotSelect.value = '';
-            bookButton.disabled = true;
+            window.location.reload(); // إعادة تحميل الصفحة بالكامل
         } else {
             bookingStatus.textContent = data.message || 'حدث خطأ أثناء الحجز.';
             bookingStatus.className = 'message error';
