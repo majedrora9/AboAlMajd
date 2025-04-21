@@ -17,8 +17,8 @@ async function fetchAvailableTimes() {
             timeSlotSelect.innerHTML = '<option value="">اختر وقت الحجز</option>';
             data.availableTimes.forEach(time => {
                 const option = document.createElement('option');
-                option.value = time; // القيمة بنظام 12 ساعة
-                option.textContent = time; // النص المعروض بنظام 12 ساعة
+                option.value = time; // القيمة بنظام 12 ساعة مع مساءً/ظهرًا
+                option.textContent = time; // النص المعروض بنظام 12 ساعة مع مساءً/ظهرًا
                 timeSlotSelect.appendChild(option);
             });
             timeSlotSelect.disabled = false;
@@ -39,7 +39,7 @@ async function fetchAvailableTimes() {
 // دالة للتحقق مما إذا كان اليوم هو الاثنين
 function isMonday() {
     const today = new Date();
-    return today.getDay() === 4; // 1 يمثل يوم الاثنين (الأحد هو 0)
+    return today.getDay() === 1; // تم التصحيح: 1 يمثل يوم الاثنين
 }
 
 // عند تحميل الصفحة
@@ -66,46 +66,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // حدث النقر على زر الحجز
-bookButton.addEventListener('click', async () => {
-    const userName = usernameInput.value.trim();
-    const bookingTime = timeSlotSelect.value;
-    const selectedOption = timeSlotSelect.options[timeSlotSelect.selectedIndex]; // الحصول على الخيار المحدد
+    bookButton.addEventListener('click', async () => {
+        const userName = usernameInput.value.trim();
+        const bookingTime = timeSlotSelect.value; // القيمة من <select> هي بنظام 12 ساعة مع مساءً/ظهرًا
+        const selectedOption = timeSlotSelect.options[timeSlotSelect.selectedIndex]; // الحصول على الخيار المحدد
 
-    if (!userName) {
-        bookingStatus.textContent = 'يرجى إدخال اسم المستخدم.';
-        bookingStatus.className = 'message error';
-        return;
-    }
+        if (!userName) {
+            bookingStatus.textContent = 'يرجى إدخال اسم المستخدم.';
+            bookingStatus.className = 'message error';
+            return;
+        }
 
-    if (!bookingTime) {
-        bookingStatus.textContent = 'يرجى اختيار وقت الحجز.';
-        bookingStatus.className = 'message error';
-        return;
-    }
+        if (!bookingTime) {
+            bookingStatus.textContent = 'يرجى اختيار وقت الحجز.';
+            bookingStatus.className = 'message error';
+            return;
+        }
 
-    try {
-        const response = await fetch(scriptURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `action=bookTime&userName=${encodeURIComponent(userName)}&bookingTime=${encodeURIComponent(bookingTime)}`
-        });
-        const data = await response.json();
-        if (data.success) {
-            bookingStatus.textContent = data.message;
-            bookingStatus.className = 'message success';
-            timeSlotSelect.removeChild(selectedOption); // إزالة الخيار المحدد من القائمة
-            // مسح حقول الإدخال
-            usernameInput.value = '';
-            timeSlotSelect.value = '';
-            bookButton.disabled = true;
-        } else {
-            bookingStatus.textContent = data.message || 'حدث خطأ أثناء الحجز.';
+        try {
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=bookTime&userName=${encodeURIComponent(userName)}&bookingTime=${encodeURIComponent(bookingTime)}` // إرسال الوقت بنظام 12 ساعة مع مساءً/ظهرًا
+            });
+            const data = await response.json();
+            if (data.success) {
+                bookingStatus.textContent = data.message;
+                bookingStatus.className = 'message success';
+                timeSlotSelect.removeChild(selectedOption); // إزالة الخيار المحدد من القائمة
+                // مسح حقول الإدخال
+                usernameInput.value = '';
+                timeSlotSelect.value = '';
+                bookButton.disabled = true;
+            } else {
+                bookingStatus.textContent = data.message || 'حدث خطأ أثناء الحجز.';
+                bookingStatus.className = 'message error';
+            }
+        } catch (error) {
+            console.error('حدث خطأ أثناء إرسال طلب الحجز:', error);
+            bookingStatus.textContent = 'حدث خطأ غير متوقع.';
             bookingStatus.className = 'message error';
         }
-    } catch (error) {
-        console.error('حدث خطأ أثناء إرسال طلب الحجز:', error);
-        bookingStatus.textContent = 'حدث خطأ غير متوقع.';
-        bookingStatus.className = 'message error';
-    }
-});
+    });
 });
