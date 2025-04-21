@@ -12,13 +12,13 @@ async function fetchAvailableTimes() {
     try {
         const response = await fetch(`${scriptURL}?action=getAvailableTimes`);
         const data = await response.json();
-
+        console.log(data); // أضف هذا السطر
         if (data.availableTimes && Array.isArray(data.availableTimes)) {
             timeSlotSelect.innerHTML = '<option value="">اختر وقت الحجز</option>';
             data.availableTimes.forEach(time => {
                 const option = document.createElement('option');
-                option.value = time; // القيمة بنظام 12 ساعة
-                option.textContent = time; // النص المعروض بنظام 12 ساعة
+                option.value = time;
+                option.textContent = time;
                 timeSlotSelect.appendChild(option);
             });
             timeSlotSelect.disabled = false;
@@ -35,6 +35,7 @@ async function fetchAvailableTimes() {
         bookButton.disabled = true;
     }
 }
+
 // دالة للتحقق مما إذا كان اليوم هو الاثنين
 function isMonday() {
     const today = new Date();
