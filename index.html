@@ -1,1 +1,54 @@
-<h1>Hello</h1>
+<form id="appointment-form">
+  <label for="name">الاسم:</label>
+  <input type="text" id="name" required><br>
+
+  <label for="time">الوقت (مثال: 2:00):</label>
+  <input type="text" id="time" required><br>
+
+  <label for="ampm">AM/PM:</label>
+  <select id="ampm">
+    <option value="AM">AM</option>
+    <option value="PM">PM</option>
+  </select><br>
+
+  <button type="submit">حجز الموعد</button>
+</form>
+
+<div id="response-message"></div>
+
+<script>
+  document.getElementById("appointment-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const time = document.getElementById("time").value;
+    const ampm = document.getElementById("ampm").value;
+
+    // التحقق من الموعد عبر API
+    checkAvailability(name, time, ampm);
+  });
+
+  function checkAvailability(name, time, ampm) {
+    const apiUrl = `https://script.google.com/macros/s/AKfycbx.../exec?action=checkAvailability&time=${time}`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data.available) {
+          bookAppointment(name, time, ampm);
+        } else {
+          document.getElementById("response-message").innerText = "عذراً، الموعد محجوز مسبقاً.";
+        }
+      });
+  }
+
+  function bookAppointment(name, time, ampm) {
+    const apiUrl = `https://script.google.com/macros/s/AKfycbwfq087thMPtgupASQr-O4QQ7hAQBSZhSDFNU-5rn2D9nvBBiXOvzHiiTW_Fl02M9xgpA/exec?action=bookAppointment&name=${name}&time=${time}&ampm=${ampm}`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("response-message").innerText = "تم حجز الموعد بنجاح!";
+      });
+  }
+</script>
