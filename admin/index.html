@@ -2,20 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>تسجيل الدخول</title>
+  <title>لوحة تحكم الحلاق</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-
   <style>
     body {
       font-family: 'Tahoma', sans-serif;
       background-color: #f5f5f5;
       text-align: center;
       padding: 40px;
-    }
-
-    #login-section {
-      text-align: center;
     }
 
     #admin-panel {
@@ -34,13 +29,10 @@
 
     select {
       width: 100%;
-      height: 100px;
+      height: 150px;
       padding: 10px;
       font-size: 16px;
       margin-bottom: 20px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background-color: #fafafa;
     }
 
     button {
@@ -61,89 +53,54 @@
       border-radius: 12px;
     }
 
-    .profile-image {
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      margin-top: 20px;
-      object-fit: cover;
-    }
-
-    .greeting {
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    #login-btn {
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #34a853;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    #logout-btn {
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #e64a19;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .user-info {
       margin-top: 20px;
     }
 
-    .select-container {
-      position: relative;
-    }
-
-    .select-container select {
-      position: relative;
+    #signout-btn {
+      display: none;
+      margin-top: 10px;
+      background-color: #ff5c5c;
     }
   </style>
 </head>
 <body>
 
 <h1>تسجيل الدخول كـ أدمن</h1>
-<div id="login-section">
-  <button id="login-btn">تسجيل الدخول باستخدام Google</button>
+<button id="login-btn" onclick="signIn()">تسجيل الدخول باستخدام Google</button>
+
+<div class="user-info" id="user-info" style="display: none;">
+  <p id="welcome-message"></p>
+  <button id="signout-btn" onclick="signOut()">تسجيل الخروج</button>
 </div>
 
 <div id="admin-panel">
   <h2>اختر الأوقات التي تريد إغلاقها</h2>
-  
-  <div class="select-container">
-    <select id="closed-times" multiple>
-      <option value="2:00">٢:٠٠</option>
-      <option value="2:30">٢:٣٠</option>
-      <option value="3:00">٣:٠٠</option>
-      <option value="3:30">٣:٣٠</option>
-      <option value="4:00">٤:٠٠</option>
-      <option value="4:30">٤:٣٠</option>
-      <option value="5:00">٥:٠٠</option>
-      <option value="5:30">٥:٣٠</option>
-      <option value="6:00">٦:٠٠</option>
-      <option value="6:30">٦:٣٠</option>
-      <option value="7:00">٧:٠٠</option>
-      <option value="7:30">٧:٣٠</option>
-    </select>
-  </div>
+
+  <select id="closed-times" multiple>
+    <option value="2:00">٢:٠٠</option>
+    <option value="2:30">٢:٣٠</option>
+    <option value="3:00">٣:٠٠</option>
+    <option value="3:30">٣:٣٠</option>
+    <option value="4:00">٤:٠٠</option>
+    <option value="4:30">٤:٣٠</option>
+    <option value="5:00">٥:٠٠</option>
+    <option value="5:30">٥:٣٠</option>
+    <option value="6:00">٦:٠٠</option>
+    <option value="6:30">٦:٣٠</option>
+    <option value="7:00">٧:٠٠</option>
+    <option value="7:30">٧:٣٠</option>
+  </select>
 
   <button onclick="saveClosedTimes()">حفظ الأوقات المغلقة</button>
-
-  <button id="logout-btn" onclick="signOut()">تسجيل الخروج</button>
 
   <iframe src="https://docs.google.com/spreadsheets/d/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/edit?usp=sharing"></iframe>
 </div>
 
 <script type="module">
-   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
   const firebaseConfig = {
     apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
     authDomain: "aboalmajd-486a6.firebaseapp.com",
@@ -157,15 +114,10 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
-
   const adminEmail = "majedrora9@gmail.com"; // ✨ بدّل هذا بإيميل الأدمن الخاص بك
-  let isSigningIn = false;
 
   // عند الضغط على زر تسجيل الدخول
-  document.getElementById("login-btn").addEventListener("click", () => {
-    if (isSigningIn) return;
-    isSigningIn = true;
-
+  function signIn() {
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
@@ -179,59 +131,35 @@
       .catch((error) => {
         console.error(error);
         alert(error.message);
-      })
-      .finally(() => {
-        isSigningIn = false;
       });
-  });
-
-  // مراقبة حالة الدخول
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if (user.email === adminEmail) {
-        showAdminPanel();
-      } else {
-        alert("ليس لديك صلاحية الدخول كمسؤول.");
-        signOut(auth);
-      }
-    }
-  });
+  }
 
   // عرض لوحة تحكم الأدمن
   function showAdminPanel() {
     document.getElementById("admin-panel").style.display = "block";
-    document.getElementById("login-section").style.display = "none";
-    
-    // إظهار صورة الحساب
-    const image = auth.currentUser.photoURL;
-    const profileImage = document.createElement('img');
-    profileImage.src = image || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
-    profileImage.classList.add('profile-image');
-    document.getElementById("admin-panel").prepend(profileImage);
-
-    // إظهار اسم المستخدم
-    const adminName = document.createElement('div');
-    adminName.classList.add('greeting');
-    adminName.innerText = "أهلاً " + auth.currentUser.displayName;
-    document.getElementById("admin-panel").prepend(adminName);
+    document.getElementById("login-btn").style.display = "none";
+    document.getElementById("user-info").style.display = "block";
+    document.getElementById("welcome-message").innerText = `أهلاً، ${auth.currentUser.displayName}`;
+    document.getElementById("signout-btn").style.display = "block";
   }
 
+  // عند الضغط على زر تسجيل الخروج
   function signOut() {
     auth.signOut().then(() => {
       document.getElementById("admin-panel").style.display = "none";
-      document.getElementById("login-section").style.display = "block";
       document.getElementById("login-btn").style.display = "block";
+      document.getElementById("user-info").style.display = "none";
     }).catch((error) => {
-      console.log("Error signing out:", error);
+      console.error("Sign out error:", error);
     });
   }
 
-  function saveClosedTimes() {
-    const selectedTimes = Array.from(document.getElementById("closed-times").selectedOptions).map(option => option.value);
-    console.log("الأوقات المغلقة: ", selectedTimes);
-    // هنا يمكنك إضافة الكود لحفظ الأوقات المغلقة في الـ Google Sheets أو قاعدة بيانات
-    alert('تم حفظ الأوقات المغلقة: ' + selectedTimes.join(', '));
-  }
+  // مراقبة حالة الدخول
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.email === adminEmail) {
+      showAdminPanel();
+    }
+  });
 </script>
 
 </body>
