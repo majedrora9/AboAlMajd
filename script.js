@@ -17,8 +17,8 @@ async function fetchAvailableTimes() {
             timeSlotSelect.innerHTML = '<option value="">اختر وقت الحجز</option>';
             data.availableTimes.forEach(time => {
                 const option = document.createElement('option');
-                option.value = time; // القيمة بنظام 12 ساعة مع مساءً/ظهرًا
-                option.textContent = time; // النص المعروض بنظام 12 ساعة مع مساءً/ظهرًا
+                option.value = time; // القيمة بنظام 12 ساعة مع ظهراً/مساءً
+                option.textContent = time; // النص المعروض بنظام 12 ساعة مع ظهراً/مساءً
                 timeSlotSelect.appendChild(option);
             });
             timeSlotSelect.disabled = false;
