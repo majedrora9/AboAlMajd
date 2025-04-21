@@ -17,38 +17,35 @@
 <div id="response-message"></div>
 
 <script>
-  document.getElementById("appointment-form").addEventListener("submit", function(event) {
-    event.preventDefault();
+function checkAvailability(name, time, ampm) {
+  // تأكد من استخدام البيانات باللغة العربية في الرابط
+  const apiUrl = `https://script.google.com/macros/s/AKfycbwfq087thMPtgupASQr-O4QQ7hAQBSZhSDFNU-5rn2D9nvBBiXOvzHiiTW_Fl02M9xgpA/exec?action=checkAvailability&time=${time}`;
 
-    const name = document.getElementById("name").value;
-    const time = document.getElementById("time").value;
-    const ampm = document.getElementById("ampm").value;
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      if (data.available) {
+        bookAppointment(name, time, ampm); // إذا الموعد متاح، إحجز
+      } else {
+        document.getElementById("response-message").innerText = "عذراً، الموعد محجوز مسبقاً.";
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking availability:", error);
+    });
+}
 
-    // التحقق من الموعد عبر API
-    checkAvailability(name, time, ampm);
-  });
+function bookAppointment(name, time, ampm) {
+  const apiUrl = `https://script.google.com/macros/s/AKfycbwfq087thMPtgupASQr-O4QQ7hAQBSZhSDFNU-5rn2D9nvBBiXOvzHiiTW_Fl02M9xgpA/exec?action=bookAppointment&name=${name}&time=${time}&ampm=${ampm}`;
 
-  function checkAvailability(name, time, ampm) {
-    const apiUrl = `https://script.google.com/macros/s/AKfycbx.../exec?action=checkAvailability&time=${time}`;
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("response-message").innerText = "تم حجز الموعد بنجاح!";
+    })
+    .catch((error) => {
+      console.error("Error booking appointment:", error);
+    });
+}
 
-    fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        if (data.available) {
-          bookAppointment(name, time, ampm);
-        } else {
-          document.getElementById("response-message").innerText = "عذراً، الموعد محجوز مسبقاً.";
-        }
-      });
-  }
-
-  function bookAppointment(name, time, ampm) {
-    const apiUrl = `https://script.google.com/macros/s/AKfycbwfq087thMPtgupASQr-O4QQ7hAQBSZhSDFNU-5rn2D9nvBBiXOvzHiiTW_Fl02M9xgpA/exec?action=bookAppointment&name=${name}&time=${time}&ampm=${ampm}`;
-
-    fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById("response-message").innerText = "تم حجز الموعد بنجاح!";
-      });
-  }
 </script>
