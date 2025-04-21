@@ -8,17 +8,38 @@ const mondayClosedMessage = document.getElementById('monday-closed');
 const scriptURL = 'https://script.google.com/macros/s/AKfycbyZW964381Wj1ZdMieUakqZisRpP-9VTPHbfSHbWoeEF-6qZrDEHAjmUrFP6GeBusFgoQ/exec';
 
 // دالة لجلب الأوقات المتاحة من Google Apps Script
+// دالة لتحويل الوقت من نظام 24 ساعة إلى 12 ساعة مع "مساءً" أو "صباحاً"
+function convertTo12HourFormat(time24) {
+    const [hour, minute] = time24.split(':').map(Number); // تقسيم الوقت إلى ساعة ودقيقة
+    let period = 'مساءً'; // نعتبر جميع الأوقات في المساء (إلا لو كانت الصباح)
+    let hour12 = hour % 12; // تحويل الساعة إلى 12 ساعة (إذا كانت الساعة 0 تصبح 12)
+    
+    if (hour === 0) {
+        hour12 = 12; // الساعة 0 تصبح 12:00 صباحاً
+        period = 'صباحاً';
+    } else if (hour < 12) {
+        period = 'صباحاً';
+    } else if (hour === 12) {
+        hour12 = 12; // الساعة 12 تبقى 12:00
+    }
+    
+    return `${hour12}:${minute < 10 ? '00' : minute} ${period}`; // إعادة صياغة الوقت
+}
+
+// دالة لجلب الأوقات المتاحة من Google Apps Script
 async function fetchAvailableTimes() {
     try {
         const response = await fetch(`${scriptURL}?action=getAvailableTimes`);
         const data = await response.json();
-        console.log(data); // أضف هذا السطر
+        console.log(data); // أضف هذا السطر لمساعدتك في التصحيح
+
         if (data.availableTimes && Array.isArray(data.availableTimes)) {
             timeSlotSelect.innerHTML = '<option value="">اختر وقت الحجز</option>';
             data.availableTimes.forEach(time => {
                 const option = document.createElement('option');
+                const time12 = convertTo12HourFormat(time); // تحويل الوقت إلى 12 ساعة مع مساءً/صباحاً
                 option.value = time;
-                option.textContent = time;
+                option.textContent = time12; // عرض الوقت المحول
                 timeSlotSelect.appendChild(option);
             });
             timeSlotSelect.disabled = false;
@@ -35,6 +56,7 @@ async function fetchAvailableTimes() {
         bookButton.disabled = true;
     }
 }
+
 
 // دالة للتحقق مما إذا كان اليوم هو الاثنين
 function isMonday() {
