@@ -137,10 +137,10 @@
   // عرض لوحة تحكم الأدمن
   function showAdminPanel() {
     document.getElementById("admin-panel").style.display = "block";
-    document.getElementById("login-btn").style.display = "none";
+    document.getElementById("login-btn").style.display = "none"; // إخفاء زر تسجيل الدخول
     document.getElementById("user-info").style.display = "block";
     document.getElementById("welcome-message").innerText = `أهلاً، ${auth.currentUser.displayName}`;
-    document.getElementById("signout-btn").style.display = "block";
+    document.getElementById("signout-btn").style.display = "block"; // إظهار زر تسجيل الخروج
   }
 
   // عند الضغط على زر تسجيل الخروج
@@ -149,6 +149,7 @@
       document.getElementById("admin-panel").style.display = "none";
       document.getElementById("login-btn").style.display = "block";
       document.getElementById("user-info").style.display = "none";
+      document.getElementById("signout-btn").style.display = "none"; // إخفاء زر تسجيل الخروج
     }).catch((error) => {
       console.error("Sign out error:", error);
     });
