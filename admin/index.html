@@ -145,7 +145,7 @@
 
   // عند الضغط على زر تسجيل الخروج
   function handleSignOut() {
-    auth.signOut().then(() => {
+    signOut(auth).then(() => {
       document.getElementById("admin-panel").style.display = "none";
       document.getElementById("login-btn").style.display = "block";
       document.getElementById("user-info").style.display = "none";
@@ -153,6 +153,21 @@
     }).catch((error) => {
       console.error("Sign out error:", error);
     });
+  }
+
+  // حفظ الأوقات المغلقة
+  function saveClosedTimes() {
+    const closedTimes = Array.from(document.getElementById("closed-times").selectedOptions)
+      .map(option => option.value);
+
+    if (closedTimes.length === 0) {
+      alert("لم يتم اختيار أي وقت.");
+      return;
+    }
+
+    // عملية حفظ الأوقات (مثلاً إلى قاعدة بيانات أو غيرها)
+    console.log("تم حفظ الأوقات المغلقة: ", closedTimes);
+    alert("تم حفظ الأوقات المغلقة بنجاح.");
   }
 
   // مراقبة حالة الدخول
