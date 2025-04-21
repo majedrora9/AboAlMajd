@@ -164,8 +164,13 @@
 
   // مراقبة حالة الدخول
   onAuthStateChanged(auth, (user) => {
-    if (user && user.email === adminEmail) {
-      showAdminPanel();
+    if (user) {
+      if (user.email === adminEmail) {
+        showAdminPanel();
+      } else {
+        alert("ليس لديك صلاحية الدخول كمسؤول.");
+        signOut(auth);
+      }
     }
   });
 
@@ -173,7 +178,6 @@
   function showAdminPanel() {
     document.getElementById("admin-panel").style.display = "block";
     document.getElementById("login-section").style.display = "none";
-    document.getElementById("admin-name").innerText = "أهلاً " + auth.currentUser.displayName;
     
     // إظهار صورة الحساب
     const image = auth.currentUser.photoURL;
@@ -181,6 +185,12 @@
     profileImage.src = image || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
     profileImage.classList.add('profile-image');
     document.getElementById("admin-panel").prepend(profileImage);
+
+    // إظهار اسم المستخدم
+    const adminName = document.createElement('div');
+    adminName.classList.add('greeting');
+    adminName.innerText = "أهلاً " + auth.currentUser.displayName;
+    document.getElementById("admin-panel").prepend(adminName);
   }
 
   function saveClosedTimes() {
