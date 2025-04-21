@@ -111,6 +111,8 @@
       try {
         const response = await fetch(`${apiUrl}?action=getClosedAndBooked`);
         const data = await response.json();
+
+        // تحقق من ما إذا كانت البيانات تحتوي على القيم المغلقة والمحجوزة
         const closedTimes = data.closed || [];
         const bookedTimes = data.booked || [];
 
