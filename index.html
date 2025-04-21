@@ -95,7 +95,7 @@
 
       const name = document.getElementById("name").value.trim();
       const time = document.getElementById("time").value.trim();
-      checkAvailability(name, time, ampm);
+      checkAvailability(name, time);
     });
 
     function checkAvailability(name, time, ampm) {
@@ -103,7 +103,7 @@
         .then(response => response.json())
         .then(data => {
           if (data.available) {
-            bookAppointment(name, time, ampm);
+            bookAppointment(name, time);
           } else {
             document.getElementById("response-message").innerText = "❌ عذراً، الموعد محجوز مسبقاً.";
           }
@@ -114,7 +114,7 @@
         });
     }
 
-    function bookAppointment(name, time, ampm) {
+    function bookAppointment(name, time) {
       fetch(`${apiUrl}?action=bookAppointment&name=${encodeURIComponent(name)}&time=${encodeURIComponent(time)}&ampm=${encodeURIComponent(ampm)}`)
         .then(response => response.json())
         .then(data => {
