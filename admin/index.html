@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <title>لوحseة تحكم الحلاق</title>
+    <title>لوحة تحكم الحلاق</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 
@@ -103,97 +103,4 @@
 
       <button onclick="saveClosedTimes()">حفظ الأوقات المغلقة</button>
 
-      <iframe src="https://docs.google.com/spreadsheets/d/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/edit?usp=sharing"></iframe>
-    </div>
-
-    <script type="module">
-      import {
-        initializeApp
-      } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
-      import {
-        getAuth,
-        GoogleAuthProvider,
-        signInWithPopup,
-        signOut,
-        onAuthStateChanged
-      } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
-
-      const firebaseConfig = {
-        apiKey: 'AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE',
-        authDomain: 'aboalmajd-486a6.firebaseapp.com',
-        projectId: 'aboalmajd-486a6',
-        storageBucket: 'aboalmajd-486a6.firebasestorage.app',
-        messagingSenderId: '725610405729',
-        appId: '1:725610405729:web:0718744134924904baef20',
-        measurementId: 'G-RYJ46JS51S'
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const provider = new GoogleAuthProvider();
-      const adminEmail = 'majedrora9@gmail.com'; // ✨ بدّل هذا بإيميل الأدمن الخاص بك
-
-      // دالة لتسجيل الدخول
-      function signIn() {
-        signInWithPopup(auth, provider)
-          .then((result) => {
-            const user = result.user;
-            if (user.email === adminEmail) {
-              showAdminPanel(user);
-            } else {
-              alert('ليس لديك صلاحية الدخول كمسؤول.');
-              signOut(auth);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            alert(error.message);
-          });
-      }
-
-      // دالة لعرض لوحة تحكم الأدمن
-      function showAdminPanel(user) {
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('login-btn').style.display = 'none'; // إخفاء زر تسجيل الدخول
-        document.getElementById('user-info').style.display = 'block';
-        document.getElementById('welcome-message').innerText = `أهلاً، ${user.displayName}`;
-        document.getElementById('user-image').src = user.photoURL;
-        document.getElementById('signout-btn').style.display = 'block'; // إظهار زر تسجيل الخروج
-      }
-
-      // دالة لتسجيل الخروج
-      function handleSignOut() {
-        signOut(auth).then(() => {
-          document.getElementById('admin-panel').style.display = 'none';
-          document.getElementById('login-btn').style.display = 'block';
-          document.getElementById('user-info').style.display = 'none';
-          document.getElementById('signout-btn').style.display = 'none'; // إخفاء زر تسجيل الخروج
-        }).catch((error) => {
-          console.error('Sign out error:', error);
-        });
-      }
-
-      // دالة لحفظ الأوقات المغلقة
-      function saveClosedTimes() {
-        const closedTimes = Array.from(document.getElementById('closed-times').selectedOptions)
-          .map(option => option.value);
-
-        if (closedTimes.length === 0) {
-          alert('لم يتم اختيار أي وقت.');
-          return;
-        }
-
-        // عملية حفظ الأوقات (مثلاً إلى قاعدة بيانات أو غيرها)
-        console.log('تم حفظ الأوقات المغلقة: ', closedTimes);
-        alert('تم حفظ الأوقات المغلقة بنجاح.');
-      }
-
-      // مراقبة حالة الدخول
-      onAuthStateChanged(auth, (user) => {
-        if (user && user.email === adminEmail) {
-          showAdminPanel(user);
-        }
-      });
-    </script>
-  </body>
-</html>
+      <iframe src="https://docs.google.com
