@@ -1,18 +1,15 @@
 <form id="appointment-form">
-  <label for="name">الاسم:</label>
-  <input type="text" id="name" required><br>
-
-  <label for="time">الوقت (مثال: 4:00):</label>
-  <input type="text" id="time" required><br>
-
-  <label for="ampm">AM/PM:</label>
-  <select id="ampm">
+  <input type="text" id="name" name="name" placeholder="الاسم" autocomplete="name" required>
+  <input type="text" id="time" name="time" placeholder="الوقت (مثال: 2:00)" autocomplete="off" required>
+  
+  <select id="ampm" name="ampm" autocomplete="off">
     <option value="AM">AM</option>
     <option value="PM">PM</option>
-  </select><br>
-
+  </select>
+  
   <button type="submit">حجز الموعد</button>
 </form>
+
 
 <div id="response-message"></div>
 
