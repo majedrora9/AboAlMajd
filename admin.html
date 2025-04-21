@@ -83,8 +83,13 @@
   <iframe src="https://docs.google.com/spreadsheets/d/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/edit?usp=sharing"></iframe>
 </div>
 
-<script>
-const firebaseConfig = {
+<script type="module">
+
+
+   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  
+  const firebaseConfig = {
   apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
   authDomain: "aboalmajd-486a6.firebaseapp.com",
   projectId: "aboalmajd-486a6",
@@ -94,37 +99,49 @@ const firebaseConfig = {
   measurementId: "G-RYJ46JS51S"
 };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+ const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-  const adminEmail = "majedrora9@gmail.com"; // استبدله ببريد الأدمن
+  const adminEmail = "majedrora9@gmail.com"; // ✨ بدّل هذا بإيميل الأدمن الخاص بك
+  let isSigningIn = false;
 
-  function signIn() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
+  // عند الضغط على زر تسجيل الدخول
+  document.getElementById("login-btn").addEventListener("click", () => {
+    if (isSigningIn) return;
+    isSigningIn = true;
+
+    signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
         if (user.email === adminEmail) {
-          document.getElementById("admin-panel").style.display = "block";
+          showAdminPanel();
         } else {
-          alert("عذراً، هذا الحساب غير مصرح له بالدخول.");
+          alert("ليس لديك صلاحية الدخول كمسؤول.");
+          signOut(auth);
         }
       })
       .catch((error) => {
         console.error(error);
         alert(error.message);
-      });
-  }
-
-  function saveClosedTimes() {
-    const selectedOptions = Array.from(document.getElementById("closed-times").selectedOptions).map(opt => opt.value);
-    fetch("https://script.google.com/macros/s/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/exec", {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "setClosedTimes",
-        times: selectedOptions.join(",")
       })
-    }).then(() => alert("تم حفظ الأوقات المغلقة"));
+      .finally(() => {
+        isSigningIn = false;
+      });
+  });
+
+  // مراقبة حالة الدخول
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.email === adminEmail) {
+      showAdminPanel();
+    }
+  });
+
+  // عرض لوحة تحكم الأدمن
+  function showAdminPanel() {
+    document.getElementById("admin-panel").style.display = "block";
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("admin-name").innerText = "أهلاً " + auth.currentUser.displayName;
   }
 </script>
 
