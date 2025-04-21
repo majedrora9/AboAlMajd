@@ -71,7 +71,7 @@
 
 <div class="user-info" id="user-info" style="display: none;">
   <p id="welcome-message"></p>
-  <button id="signout-btn" onclick="signOut()">تسجيل الخروج</button>
+  <button id="signout-btn" onclick="handleSignOut()">تسجيل الخروج</button>
 </div>
 
 <div id="admin-panel">
@@ -144,7 +144,7 @@
   }
 
   // عند الضغط على زر تسجيل الخروج
-  function signOut() {
+  function handleSignOut() {
     auth.signOut().then(() => {
       document.getElementById("admin-panel").style.display = "none";
       document.getElementById("login-btn").style.display = "block";
