@@ -18,7 +18,7 @@ async function fetchAvailableTimes() {
             data.availableTimes.forEach(time => {
                 const option = document.createElement('option');
                 option.value = time;
-                option.textContent = time;
+                option.textContent = time; // هنا يتم عرض الوقت كما هو قادم من السكريبت
                 timeSlotSelect.appendChild(option);
             });
             timeSlotSelect.disabled = false;
