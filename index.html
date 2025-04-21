@@ -19,7 +19,7 @@
 <script>
 function checkAvailability(name, time, ampm) {
   // تأكد من استخدام البيانات باللغة العربية في الرابط
-  const apiUrl = `https://script.google.com/macros/s/AKfycbwfq087thMPtgupASQr-O4QQ7hAQBSZhSDFNU-5rn2D9nvBBiXOvzHiiTW_Fl02M9xgpA/exec?action=checkAvailability&time=${time}`;
+  const apiUrl = `https://script.google.com/macros/s/AKfycbwfq087thMPtgupASQr-O4QQ7hAQBSZhSDFNU-5rn2D9nvBBiXOvzHiiTW_Fl02M9xgpA/exec`;
 
   fetch(apiUrl)
     .then(response => response.json())
