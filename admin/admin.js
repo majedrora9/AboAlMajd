@@ -81,7 +81,7 @@ loginButton.addEventListener('click', async () => {
     }
 });
 
-// حدث تسجيل الخروج
+//تسجيل الخروج
 logoutButton.addEventListener('click', async () => {
     try {
         await auth.signOut();
@@ -93,4 +93,6 @@ logoutButton.addEventListener('click', async () => {
     } catch (error) {
         console.error('خطأ في تسجيل الخروج:', error);
         authStatus.textContent = `حدث خطأ في تسجيل الخروج: ${error.message}`;
-        authStatus.className = 'message
+        authStatus.className = 'message error'; // تم الإكمال هنا
+    }
+});
