@@ -68,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // حدث النقر على زر الحجز
 bookButton.addEventListener('click', async () => {
     const userName = usernameInput.value.trim();
-    const bookingTime24 = timeSlotSelect.value; // القيمة في <select> ستكون بنظام 24 ساعة
+    const bookingTime = timeSlotSelect.value;
+    const selectedOption = timeSlotSelect.options[timeSlotSelect.selectedIndex]; // الحصول على الخيار المحدد
 
     if (!userName) {
         bookingStatus.textContent = 'يرجى إدخال اسم المستخدم.';
@@ -76,50 +77,27 @@ bookButton.addEventListener('click', async () => {
         return;
     }
 
-    if (!bookingTime24) {
+    if (!bookingTime) {
         bookingStatus.textContent = 'يرجى اختيار وقت الحجز.';
         bookingStatus.className = 'message error';
         return;
     }
 
-    // تحويل وقت 24 ساعة إلى 12 ساعة مع إضافة مساءً/ظهرًا
-    const [hours24, minutes] = bookingTime24.split(':');
-    let hours12 = parseInt(hours24, 10);
-    const period = hours12 >= 12 ? 'مساءً' : 'ظهرًا';
-    hours12 = hours12 % 12;
-    hours12 = hours12 === 0 ? 12 : hours12;
-    const bookingTime12 = `${hours12}:${minutes} ${period}`;
-
-    // التحقق إذا كان المستخدم قد حجز بالفعل في نفس اليوم (يبقى كما هو)
-    try {
-        const checkBookingResponse = await fetch(`${scriptURL}?action=hasBookedToday&userName=${userName}`);
-        const checkBookingData = await checkBookingResponse.json();
-        if (checkBookingData.hasBooked) {
-            bookingStatus.textContent = 'لقد قمت بالفعل بحجز موعد لهذا اليوم.';
-            bookingStatus.className = 'message error';
-            return;
-        }
-    } catch (error) {
-        console.error('حدث خطأ أثناء التحقق من الحجز السابق:', error);
-        bookingStatus.textContent = 'حدث خطأ أثناء التحقق من الحجز.';
-        bookingStatus.className = 'message error';
-        return;
-    }
-
-    // إرسال طلب الحجز إلى Google Apps Script بنظام 12 ساعة
     try {
         const response = await fetch(scriptURL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `action=bookTime&userName=${encodeURIComponent(userName)}&bookingTime=${encodeURIComponent(bookingTime12)}`, // تم التغيير إلى bookingTime12
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=bookTime&userName=${encodeURIComponent(userName)}&bookingTime=${encodeURIComponent(bookingTime)}`
         });
         const data = await response.json();
         if (data.success) {
             bookingStatus.textContent = data.message;
             bookingStatus.className = 'message success';
-            window.location.reload(); // إعادة تحميل الصفحة بالكامل
+            timeSlotSelect.removeChild(selectedOption); // إزالة الخيار المحدد من القائمة
+            // مسح حقول الإدخال
+            usernameInput.value = '';
+            timeSlotSelect.value = '';
+            bookButton.disabled = true;
         } else {
             bookingStatus.textContent = data.message || 'حدث خطأ أثناء الحجز.';
             bookingStatus.className = 'message error';
