@@ -85,78 +85,89 @@
   <div id="response-message"></div>
 
   <script>
-const apiUrl = "https://script.google.com/macros/s/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/exec";
+<script>
+  const apiUrl = "https://script.google.com/macros/s/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/exec";
 
-// استخدام fetch لجلب البيانات مع التأكد من وجود الـ action
-async function loadAvailableTimes() {
-  updateTimeDisplay();
+  const workingHours = [
+    "2:00", "2:30", "3:00", "3:30", "4:00", "4:30", "5:00", "5:30", "6:00", "6:30", "7:00", "7:30", "8:00"
+  ];
 
-  try {
-    const response = await fetch(`${apiUrl}?action=getClosedAndBooked`);
-    const data = await response.json();
-
-    if (data.error) {
-      throw new Error(data.error);  // في حال كانت الإجابة خطأ
-    }
-
-    const closedTimes = data.closed || [];
-    const bookedTimes = data.booked || [];
-
-    const timeSelect = document.getElementById("time");
-    timeSelect.innerHTML = "";
-
-    const availableTimes = workingHours.filter(time => {
-      const [hourStr, minuteStr] = time.split(":");
-      const hour = parseInt(hourStr);
-      const minute = parseInt(minuteStr);
-      const isPast = hour < currentHour || (hour === currentHour && minute <= currentMinute);
-      return !isPast && !closedTimes.includes(time) && !bookedTimes.includes(time);
-    });
-
-    if (availableTimes.length === 0) {
-      const option = document.createElement("option");
-      option.textContent = "انتهت أوقات الحجز لهذا اليوم";
-      option.disabled = true;
-      option.selected = true;
-      timeSelect.appendChild(option);
-    } else {
-      availableTimes.forEach(time => {
-        const option = document.createElement("option");
-        option.value = time;
-        option.textContent = time;
-        timeSelect.appendChild(option);
-      });
-      document.getElementById("submit-btn").disabled = false;
-    }
-  } catch (error) {
-    console.error("Error loading times:", error);
-    document.getElementById("response-message").innerText = "⚠️ فشل تحميل الأوقات. حاول مجددًا.";
-    document.getElementById("submit-btn").disabled = true;
+  // دالة لعرض الوقت الحالي
+  function updateTimeDisplay() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    document.getElementById("current-time").innerText = now.toLocaleString('ar-EG', options);
   }
-}
 
+  async function loadAvailableTimes() {
+    updateTimeDisplay(); // تحديث الوقت الحالي عند بداية تحميل الأوقات
 
-    function bookAppointment(name, time) {
-      fetch(`${apiUrl}?action=bookAppointment&name=${encodeURIComponent(name)}&time=${encodeURIComponent(time)}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById("response-message").innerText = "✅ تم حجز الموعد بنجاح!";
-          loadAvailableTimes();
-        })
-        .catch(error => {
-          console.error("Error booking appointment:", error);
-          document.getElementById("response-message").innerText = "حدث خطأ أثناء الحجز.";
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    try {
+      const response = await fetch(`${apiUrl}?action=getClosedAndBooked`);
+      const data = await response.json();
+      const closedTimes = data.closed || [];
+      const bookedTimes = data.booked || [];
+
+      const timeSelect = document.getElementById("time");
+      timeSelect.innerHTML = "";
+
+      const availableTimes = workingHours.filter(time => {
+        const [hourStr, minuteStr] = time.split(":");
+        const hour = parseInt(hourStr);
+        const minute = parseInt(minuteStr);
+        const isPast = hour < currentHour || (hour === currentHour && minute <= currentMinute);
+        return !isPast && !closedTimes.includes(time) && !bookedTimes.includes(time);
+      });
+
+      if (availableTimes.length === 0) {
+        const option = document.createElement("option");
+        option.textContent = "انتهت أوقات الحجز لهذا اليوم";
+        option.disabled = true;
+        option.selected = true;
+        timeSelect.appendChild(option);
+      } else {
+        availableTimes.forEach(time => {
+          const option = document.createElement("option");
+          option.value = time;
+          option.textContent = time;
+          timeSelect.appendChild(option);
         });
+        document.getElementById("submit-btn").disabled = false;
+      }
+    } catch (error) {
+      console.error("Error loading times:", error);
+      document.getElementById("response-message").innerText = "⚠️ فشل تحميل الأوقات. حاول مجددًا.";
+      document.getElementById("submit-btn").disabled = true;
     }
+  }
 
-    document.getElementById("appointment-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const time = document.getElementById("time").value;
-      bookAppointment(name, time);
-    });
+  document.getElementById("appointment-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const time = document.getElementById("time").value;
+    bookAppointment(name, time);
+  });
 
-    loadAvailableTimes();
+  function bookAppointment(name, time) {
+    fetch(`${apiUrl}?action=bookAppointment&name=${encodeURIComponent(name)}&time=${encodeURIComponent(time)}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("response-message").innerText = "✅ تم حجز الموعد بنجاح!";
+        loadAvailableTimes();
+      })
+      .catch(error => {
+        console.error("Error booking appointment:", error);
+        document.getElementById("response-message").innerText = "حدث خطأ أثناء الحجز.";
+      });
+  }
+
+  loadAvailableTimes(); // تحميل الأوقات عند بدء الصفحة
+</script>
+
   </script>
 
 </body>
