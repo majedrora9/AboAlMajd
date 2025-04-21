@@ -80,22 +80,21 @@
 
   <button onclick="saveClosedTimes()">حفظ الأوقات المغلقة</button>
 
-  <iframe src="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/edit?usp=sharing"></iframe>
+  <iframe src="https://docs.google.com/spreadsheets/d/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/edit?usp=sharing"></iframe>
 </div>
 
 <script>
-  // Firebase config (استبدله ببيانات مشروعك)
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
+    authDomain: "aboalmajd-486a6.firebaseapp.com",
+    projectId: "aboalmajd-486a6",
+    appId: "aboalmajd-486a6"
   };
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  const adminEmail = "admin@example.com"; // استبدله ببريد الأدمن
+  const adminEmail = "majedrora9@gmail.com"; // استبدله ببريد الأدمن
 
   function signIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -116,7 +115,7 @@
 
   function saveClosedTimes() {
     const selectedOptions = Array.from(document.getElementById("closed-times").selectedOptions).map(opt => opt.value);
-    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbyd3HYZwreEJUXe_L7D9u46vf6ztD0631JkLpJsO9QuDc3mq-pQ95VCbVNk5Ea9z86OaA/exec", {
       method: "POST",
       body: new URLSearchParams({
         action: "setClosedTimes",
