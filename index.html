@@ -79,7 +79,7 @@
     <select id="time" name="time" required>
       <option disabled selected>جاري تحميل الأوقات...</option>
     </select>
-    <button type="submit">احجز الآن</button>
+    <button type="submit" id="submit-button" disabled>احجز الآن</button>
   </form>
 
   <div id="response-message"></div>
@@ -104,6 +104,9 @@
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
 
+      // Disable the submit button while loading
+      document.getElementById("submit-button").disabled = true;
+
       try {
         const response = await fetch(`${apiUrl}?action=getClosedAndBooked`);
         const data = await response.json();
@@ -111,7 +114,7 @@
         const bookedTimes = data.booked || [];
 
         const timeSelect = document.getElementById("time");
-        timeSelect.innerHTML = "";
+        timeSelect.innerHTML = ""; // Clear previous options
 
         const availableTimes = workingHours.filter(time => {
           const [hourStr, minuteStr] = time.split(":");
@@ -135,9 +138,14 @@
             timeSelect.appendChild(option);
           });
         }
+
+        // Enable the submit button after loading times
+        document.getElementById("submit-button").disabled = false;
+
       } catch (error) {
         console.error("Error loading times:", error);
         document.getElementById("response-message").innerText = "⚠️ فشل تحميل الأوقات. حاول مجددًا.";
+        document.getElementById("submit-button").disabled = false;
       }
     }
 
@@ -146,7 +154,7 @@
         .then(response => response.json())
         .then(data => {
           document.getElementById("response-message").innerText = "✅ تم حجز الموعد بنجاح!";
-          loadAvailableTimes();
+          loadAvailableTimes(); // Reload available times after booking
         })
         .catch(error => {
           console.error("Error booking appointment:", error);
@@ -161,7 +169,7 @@
       bookAppointment(name, time);
     });
 
-    loadAvailableTimes();
+    loadAvailableTimes(); // Call it initially when the page loads
   </script>
 
 </body>
