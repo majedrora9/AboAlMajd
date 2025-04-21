@@ -58,7 +58,7 @@
 <body>
 
 <h1>تسجيل الدخول كـ أدمن</h1>
-<button onclick="signIn()">تسجيل الدخول باستخدام Google</button>
+<button id="login-btn">تسجيل الدخول باستخدام Google</button>
 
 <div id="admin-panel">
   <h2>اختر الأوقات التي تريد إغلاقها</h2>
@@ -84,22 +84,20 @@
 </div>
 
 <script type="module">
-
-
    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
   
   const firebaseConfig = {
-  apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
-  authDomain: "aboalmajd-486a6.firebaseapp.com",
-  projectId: "aboalmajd-486a6",
-  storageBucket: "aboalmajd-486a6.firebasestorage.app",
-  messagingSenderId: "725610405729",
-  appId: "1:725610405729:web:0718744134924904baef20",
-  measurementId: "G-RYJ46JS51S"
-};
+    apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
+    authDomain: "aboalmajd-486a6.firebaseapp.com",
+    projectId: "aboalmajd-486a6",
+    storageBucket: "aboalmajd-486a6.firebasestorage.app",
+    messagingSenderId: "725610405729",
+    appId: "1:725610405729:web:0718744134924904baef20",
+    measurementId: "G-RYJ46JS51S"
+  };
 
- const app = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
