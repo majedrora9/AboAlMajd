@@ -112,7 +112,7 @@ const firebaseConfig = {
       })
       .catch((error) => {
         console.error(error);
-        alert("فشل تسجيل الدخول");
+        alert(error.message);
       });
   }
 
