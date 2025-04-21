@@ -69,12 +69,18 @@
 
   <form id="appointment-form">
     <input type="text" id="name" name="name" placeholder="الاسم" autocomplete="name" required>
-    <input type="text" id="time" name="time" placeholder="الوقت (مثال: 2:00)" autocomplete="off" required>
 
-    <select id="ampm" name="ampm" autocomplete="off">
-      <option value="AM">صباحاً</option>
-      <option value="PM">مساءً</option>
-    </select>
+<select id="time" name="time" required>
+  <option value="2:00">٢:٠٠ ظهراً</option>
+  <option value="2:30">٢:٣٠ ظهراً</option>
+  <option value="3:00">٣:٠٠ عصراً</option>
+  <option value="3:30">٣:٣٠ عصراً</option>
+  <option value="4:00">٤:٠٠ عصراً</option>
+  <option value="4:30">٤:٣٠ عصراً</option>
+  <option value="5:00">٥:٠٠ مساءً</option>
+  <option value="5:30">٥:٣٠ مساءً</option>
+</select>
+
 
     <button type="submit">احجز الآن</button>
   </form>
