@@ -37,7 +37,10 @@ async function fetchAvailableTimes() {
 }
 
 // دالة للتحقق مما إذا كان اليوم هو الاثنين
-
+function isMonday() {
+    const today = new Date();
+    return today.getDay() === 2; // 1 يمثل يوم الاثنين (الأحد هو 0)
+}
 
 // عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
