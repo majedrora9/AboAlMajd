@@ -15,14 +15,20 @@ async function fetchAvailableTimes() {
 
         if (data.availableTimes && Array.isArray(data.availableTimes)) {
             timeSlotSelect.innerHTML = '<option value="">اختر وقت الحجز</option>';
-            data.availableTimes.forEach(time => {
+            data.availableTimes.forEach(time24 => {
+                const [hours24, minutes] = time24.split(':');
+                let hours12 = parseInt(hours24, 10);
+                const period = hours12 >= 12 ? 'مساءً' : 'ظهرًا';
+                hours12 = hours12 % 12;
+                hours12 = hours12 === 0 ? 12 : hours12; // تحويل 0 إلى 12
+                const formattedTime = `${hours12}:${minutes} ${period}`;
                 const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time; // هنا يتم عرض الوقت كما هو قادم من السكريبت
+                option.value = time24; // احتفظ بقيمة 24 ساعة للحجز
+                option.textContent = formattedTime;
                 timeSlotSelect.appendChild(option);
             });
             timeSlotSelect.disabled = false;
-            bookButton.disabled = true; // يتم تفعيل زر الحجز عند اختيار الوقت
+            bookButton.disabled = true;
         } else {
             timeSlotSelect.innerHTML = '<option value="">لا توجد أوقات متاحة حاليًا</option>';
             timeSlotSelect.disabled = true;
