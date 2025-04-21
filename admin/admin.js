@@ -27,7 +27,7 @@ const sheetsUrlInput = document.getElementById('sheets-url');
 const sheetsIframe = document.getElementById('sheets-iframe');
 
 // قائمة بحسابات الأدمن المسموح بها (عدلها حسب حاجتك)
-const allowedAdmins = ['majedrora9@gmail.com', 'another_admin@example.com'];
+const allowedAdmins = ['majedrora9@gmail.com', 'siciliamcserver@gmail.com'];
 
 // استبدل بهذا الرابط بعنوان URL لتطبيق الويب الخاص بك في Google Apps Script
 const scriptURL = 'https://script.google.com/macros/s/AKfycbyZW964381Wj1ZdMieUakqZisRpP-9VTPHbfSHbWoeEF-6qZrDEHAjmUrFP6GeBusFgoQ/exec';
