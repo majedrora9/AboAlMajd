@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>لوحة الإدارة</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <!-- Firebase Libraries (Use type="module") -->
   <script type="module">
@@ -39,7 +40,7 @@
       bookingList.innerHTML = "";
       bookings.forEach((b, i) => {
         const li = document.createElement("li");
-        li.textContent = `${b.name} - ${b.time}`;
+        li.textContent = `${b.name} - ${b.time} - ${b.date}`;
         const btn = document.createElement("button");
         btn.textContent = "حذف";
         btn.onclick = () => {
@@ -117,7 +118,6 @@
         signinDiv.style.display = "block"; // Show login button if not logged in
         adminProfile.style.display = "none"; // Hide admin profile section
         bookingList.style.display = "none"; // Hide booking list section
-        loginButton.disabled = false; // Ensure login button is enabled if not logged in
       }
     };
   </script>
@@ -132,6 +132,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      transition: all 0.3s ease-in-out;
     }
     h1 {
       color: #343a40;
