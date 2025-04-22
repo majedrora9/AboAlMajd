@@ -33,6 +33,7 @@
     const adminName = document.getElementById("adminName");
     const adminProfilePic = document.getElementById("adminProfilePic");
     const signinDiv = document.getElementById("signinDiv");
+    const loginButton = document.getElementById("loginButton"); // Reference to login button
 
     function renderBookings() {
       bookingList.innerHTML = "";
@@ -66,6 +67,7 @@
           adminProfilePic.src = result.user.photoURL;
           bookingList.style.display = "block";
           renderBookings();
+          loginButton.disabled = true; // Disable login button after login
         } else {
           showAlert("هذا البريد غير مصرح له بالدخول.");
           signOut(auth);
@@ -75,16 +77,18 @@
       });
     };
 
-    function signOutAdmin() {
+    // Correct signOutAdmin function
+    window.signOutAdmin = function () {
       signOut(auth).then(() => {
         localStorage.removeItem("adminEmail");
         localStorage.removeItem("adminProfilePic");
         localStorage.removeItem("adminName");
+        loginButton.disabled = false; // Enable login button after sign-out
         window.location.reload();
       }).catch(error => {
         showAlert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
       });
-    }
+    };
 
     // Show custom alert messages
     function showAlert(message) {
@@ -107,6 +111,7 @@
         adminProfilePic.src = profilePic;
         bookingList.style.display = "block";
         renderBookings();
+        loginButton.disabled = true; // Disable login button if user is already logged in
       }
     }
   </script>
@@ -244,7 +249,7 @@
   <h1>حجوزات الإدارة</h1>
 
   <div id="signinDiv">
-    <button onclick="loginWithGoogle()">تسجيل الدخول باستخدام Google</button>
+    <button id="loginButton" onclick="loginWithGoogle()">تسجيل الدخول باستخدام Google</button>
   </div>
 
   <div id="adminProfile">
