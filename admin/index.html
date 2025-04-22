@@ -1,14 +1,78 @@
-<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة الإدارة</title>
+  <title>لوحة الإدارة 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
 
-  <!-- Firebase Libraries -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <!-- Firebase Libraries (Use type="module") -->
+  <script type="module">
+    // Import Firebase libraries using the modular SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
+      authDomain: "aboalmajd-486a6.firebaseapp.com",
+      projectId: "aboalmajd-486a6",
+      storageBucket: "aboalmajd-486a6.firebasestorage.app",
+      messagingSenderId: "725610405729",
+      appId: "1:725610405729:web:0718744134924904baef20",
+      measurementId: "G-RYJ46JS51S"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    
+    const ADMIN_EMAIL = "majedrora9@gmail.com";
+    const savedAdmin = localStorage.getItem("adminEmail");
+    const bookingList = document.getElementById("bookingList");
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+    function renderBookings() {
+      bookingList.innerHTML = "";
+      bookings.forEach((b, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${b.name} - ${b.time}`;
+        const btn = document.createElement("button");
+        btn.textContent = "حذف";
+        btn.onclick = () => {
+          bookings.splice(i, 1);
+          localStorage.setItem("bookings", JSON.stringify(bookings));
+          renderBookings();
+        };
+        li.appendChild(btn);
+        bookingList.appendChild(li);
+      });
+    }
+
+    function loginWithGoogle() {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider).then(result => {
+        const email = result.user.email;
+        if (email === ADMIN_EMAIL) {
+          localStorage.setItem("adminEmail", email);
+          document.getElementById("signinDiv").style.display = "none";
+          bookingList.style.display = "block";
+          renderBookings();
+        } else {
+          alert("هذا البريد غير مصرح له بالدخول.");
+          auth.signOut();
+        }
+      }).catch(error => {
+        alert("حدث خطأ في تسجيل الدخول: " + error.message);
+      });
+    }
+
+    window.onload = function () {
+      if (savedAdmin === ADMIN_EMAIL) {
+        bookingList.style.display = "block";
+        renderBookings();
+      }
+    }
+  </script>
 
   <style>
     body {
@@ -73,68 +137,5 @@
   </div>
   <ul id="bookingList" style="display:none;"></ul>
 
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
-      authDomain: "aboalmajd-486a6.firebaseapp.com",
-      projectId: "aboalmajd-486a6",
-      storageBucket: "aboalmajd-486a6.firebasestorage.app",
-      messagingSenderId: "725610405729",
-      appId: "1:725610405729:web:0718744134924904baef20",
-      measurementId: "G-RYJ46JS51S"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    const ADMIN_EMAIL = "majedrora9@gmail.com";
-    const savedAdmin = localStorage.getItem("adminEmail");
-    const bookingList = document.getElementById("bookingList");
-    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-
-    function renderBookings() {
-      bookingList.innerHTML = "";
-      bookings.forEach((b, i) => {
-        const li = document.createElement("li");
-        li.textContent = `${b.name} - ${b.time}`;
-        const btn = document.createElement("button");
-        btn.textContent = "حذف";
-        btn.onclick = () => {
-          bookings.splice(i, 1);
-          localStorage.setItem("bookings", JSON.stringify(bookings));
-          renderBookings();
-        };
-        li.appendChild(btn);
-        bookingList.appendChild(li);
-      });
-    }
-
-    function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(result => {
-        const email = result.user.email;
-        if (email === ADMIN_EMAIL) {
-          localStorage.setItem("adminEmail", email);
-          document.getElementById("signinDiv").style.display = "none";
-          bookingList.style.display = "block";
-          renderBookings();
-        } else {
-          alert("هذا البريد غير مصرح له بالدخول.");
-          auth.signOut();
-        }
-      }).catch(error => {
-        alert("حدث خطأ في تسجيل الدخول: " + error.message);
-      });
-    }
-
-    window.onload = function () {
-      if (savedAdmin === ADMIN_EMAIL) {
-        bookingList.style.display = "block";
-        renderBookings();
-      }
-    }
-  </script>
 </body>
 </html>
