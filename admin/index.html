@@ -5,8 +5,11 @@
   <meta charset="UTF-8">
   <title>لوحة الإدارة</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  
+  <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
@@ -71,6 +74,7 @@
   <ul id="bookingList" style="display:none;"></ul>
 
   <script>
+    // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
   authDomain: "aboalmajd-486a6.firebaseapp.com",
@@ -81,6 +85,7 @@ const firebaseConfig = {
   measurementId: "G-RYJ46JS51S"
 };
 
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
