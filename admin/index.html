@@ -1,1 +1,135 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة الإدارة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #222;
+    }
+    ul {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 350px;
+    }
+    button {
+      background-color: #dc3545;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #c82333;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #fdfdfd;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+    #signinDiv {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>حجوزات الإدارة</h1>
 
+  <div id="signinDiv">
+    <button onclick="loginWithGoogle()">تسجيل الدخول باستخدام Google</button>
+  </div>
+  <ul id="bookingList" style="display:none;"></ul>
+
+  <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
+  authDomain: "aboalmajd-486a6.firebaseapp.com",
+  projectId: "aboalmajd-486a6",
+  storageBucket: "aboalmajd-486a6.firebasestorage.app",
+  messagingSenderId: "725610405729",
+  appId: "1:725610405729:web:0718744134924904baef20",
+  measurementId: "G-RYJ46JS51S"
+};
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const ADMIN_EMAIL = "majedrora9@gmail.com";
+    const savedAdmin = localStorage.getItem("adminEmail");
+    const bookingList = document.getElementById("bookingList");
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+    function renderBookings() {
+      bookingList.innerHTML = "";
+      bookings.forEach((b, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${b.name} - ${b.time}`;
+        const btn = document.createElement("button");
+        btn.textContent = "حذف";
+        btn.onclick = () => {
+          bookings.splice(i, 1);
+          localStorage.setItem("bookings", JSON.stringify(bookings));
+          renderBookings();
+        };
+        li.appendChild(btn);
+        bookingList.appendChild(li);
+      });
+    }
+
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(result => {
+        const email = result.user.email;
+        if (email === ADMIN_EMAIL) {
+          localStorage.setItem("adminEmail", email);
+          document.getElementById("signinDiv").style.display = "none";
+          bookingList.style.display = "block";
+          renderBookings();
+        } else {
+          alert("هذا البريد غير مصرح له بالدخول.");
+          auth.signOut();
+        }
+      }).catch(error => {
+        alert("حدث خطأ في تسجيل الدخول: " + error.message);
+      });
+    }
+
+    window.onload = function () {
+      if (savedAdmin === ADMIN_EMAIL) {
+        bookingList.style.display = "block";
+        renderBookings();
+      }
+    }
+  </script>
+</body>
+</html>
