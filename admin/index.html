@@ -7,9 +7,8 @@
 
   <!-- Firebase Libraries (Use type="module") -->
   <script type="module">
-    // Import Firebase libraries using the modular SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
     // Firebase configuration
     const firebaseConfig = {
@@ -30,6 +29,8 @@
     const savedAdmin = localStorage.getItem("adminEmail");
     const bookingList = document.getElementById("bookingList");
     const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const adminProfile = document.getElementById("adminProfile");
+    const adminName = document.getElementById("adminName");
 
     function renderBookings() {
       bookingList.innerHTML = "";
@@ -55,20 +56,51 @@
         const email = result.user.email;
         if (email === ADMIN_EMAIL) {
           localStorage.setItem("adminEmail", email);
+          localStorage.setItem("adminProfilePic", result.user.photoURL);
+          localStorage.setItem("adminName", result.user.displayName);
           document.getElementById("signinDiv").style.display = "none";
+          adminProfile.style.display = "block";
           bookingList.style.display = "block";
           renderBookings();
         } else {
-          alert("هذا البريد غير مصرح له بالدخول.");
-          auth.signOut();
+          showAlert("هذا البريد غير مصرح له بالدخول.");
+          signOut(auth);
         }
       }).catch(error => {
-        alert("حدث خطأ في تسجيل الدخول: " + error.message);
+        showAlert("حدث خطأ في تسجيل الدخول: " + error.message);
       });
     };
 
+    function signOutAdmin() {
+      signOut(auth).then(() => {
+        localStorage.removeItem("adminEmail");
+        localStorage.removeItem("adminProfilePic");
+        localStorage.removeItem("adminName");
+        window.location.reload();
+      }).catch(error => {
+        showAlert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
+      });
+    }
+
+    // Show custom alert messages
+    function showAlert(message) {
+      const alertDiv = document.createElement("div");
+      alertDiv.classList.add("alert-message");
+      alertDiv.textContent = message;
+      document.body.appendChild(alertDiv);
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+    }
+
     window.onload = function () {
+      const profilePic = localStorage.getItem("adminProfilePic");
+      const name = localStorage.getItem("adminName");
+
       if (savedAdmin === ADMIN_EMAIL) {
+        adminProfile.style.display = "block";
+        adminName.textContent = name;
+        adminProfile.src = profilePic;
         bookingList.style.display = "block";
         renderBookings();
       }
@@ -128,6 +160,70 @@
     #signinDiv {
       margin-bottom: 20px;
     }
+
+    /* Admin Profile Section */
+    #adminProfile {
+      display: none;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-top: 20px;
+    }
+
+    #adminName {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    /* Custom Alert Message */
+    .alert-message {
+      background-color: #dc3545;
+      color: white;
+      font-size: 1rem;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      text-align: center;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    /* Hover Sign-Out Button */
+    .sign-out-btn {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 10px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: 0.3s ease;
+      width: 100%;
+    }
+
+    .sign-out-btn:hover {
+      background-color: #218838;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      ul {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -136,6 +232,13 @@
   <div id="signinDiv">
     <button onclick="loginWithGoogle()">تسجيل الدخول باستخدام Google</button>
   </div>
+
+  <div id="adminProfile">
+    <img id="adminProfilePic" alt="Admin Profile">
+    <p id="adminName"></p>
+    <button class="sign-out-btn" onclick="signOutAdmin()">تسجيل الخروج</button>
+  </div>
+
   <ul id="bookingList" style="display:none;"></ul>
 
 </body>
