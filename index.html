@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حجز حلاق</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #222;
+    }
+    h1, h2 {
+      color: #222;
+      margin-bottom: 10px;
+    }
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    input, select, button {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      width: 100%;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      transition: background-color 0.3s ease;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    a {
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>نظام حجز الحلاق</h1>
+  <div id="bookingDiv">
+    <h2>احجز موعدك</h2>
+    <form id="bookingForm">
+      <input type="text" id="name" placeholder="اسمك" required />
+      <select id="time">
+        <option value="">اختر الوقت</option>
+      </select>
+      <button type="submit">احجز</button>
+    </form>
+    <a href="admin.html">الذهاب إلى لوحة الإدارة</a>
+  </div>
+  <script>
+    const bookingForm = document.getElementById("bookingForm");
+    const selectTime = document.getElementById("time");
+    const defaultTimes = [
+      "2:00 مساءً", "3:00 مساءً", "4:00 مساءً",
+      "5:00 مساءً", "6:00 مساءً", "7:00 مساءً", "8:00 مساءً"
+    ];
+
+    const today = new Date();
+    if (today.getDay() === 1) {
+      bookingForm.innerHTML = "<strong>نأسف، نحن مغلقون يوم الاثنين. لا يمكن قبول الحجوزات.</strong>";
+    } else {
+      function loadAvailableTimes() {
+        const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+        const bookedTimes = bookings.map(b => b.time);
+        const availableTimes = defaultTimes.filter(t => !bookedTimes.includes(t));
+        selectTime.innerHTML = '<option value="">اختر الوقت</option>' +
+          availableTimes.map(t => `<option>${t}</option>`).join('');
+      }
+
+      loadAvailableTimes();
+
+      bookingForm.onsubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const time = selectTime.value;
+        if (!time) return alert("يرجى اختيار وقت.");
+        const booking = { name, time };
+        const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+        bookings.push(booking);
+        localStorage.setItem("bookings", JSON.stringify(bookings));
+        alert("تم الحجز بنجاح!");
+        bookingForm.reset();
+        loadAvailableTimes();
+      };
+    }
+  </script>
+</body>
+</html>
