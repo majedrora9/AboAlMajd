@@ -2,16 +2,17 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لوحة الإدارة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  <!-- Firebase Libraries (Use type="module") -->
+  <!-- Firebase Libraries -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    // Firebase configuration
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
       authDomain: "aboalmajd-486a6.firebaseapp.com",
@@ -34,26 +35,30 @@
     const adminName = document.getElementById("adminName");
     const adminProfilePic = document.getElementById("adminProfilePic");
     const signinDiv = document.getElementById("signinDiv");
-    const loginButton = document.getElementById("loginButton"); // Reference to login button
+    const loginButton = document.getElementById("loginButton");
 
     function renderBookings() {
       bookingList.innerHTML = "";
       bookings.forEach((b, i) => {
         const li = document.createElement("li");
-        li.textContent = `${b.name} - ${b.time} - ${b.date}`;
-        const btn = document.createElement("button");
-        btn.textContent = "حذف";
-        btn.onclick = () => {
-          bookings.splice(i, 1);
-          localStorage.setItem("bookings", JSON.stringify(bookings));
-          renderBookings();
-        };
-        li.appendChild(btn);
+        li.classList.add("booking-item");
+        li.innerHTML = `
+          <span class="booking-details">${b.name} - ${b.time} - ${b.date}</span>
+          <button class="delete-btn" onclick="deleteBooking(${i})">
+            <span class="material-icons">delete</span>
+          </button>
+        `;
         bookingList.appendChild(li);
       });
     }
 
-    // Define loginWithGoogle globally
+    // Deleting a booking
+    function deleteBooking(index) {
+      bookings.splice(index, 1);
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+      renderBookings();
+    }
+
     window.loginWithGoogle = function () {
       const provider = new GoogleAuthProvider();
       signInWithPopup(auth, provider).then(result => {
@@ -68,7 +73,7 @@
           adminProfilePic.src = result.user.photoURL;
           bookingList.style.display = "block";
           renderBookings();
-          loginButton.disabled = true; // Disable login button after login
+          loginButton.disabled = true;
         } else {
           showAlert("هذا البريد غير مصرح له بالدخول.");
           signOut(auth);
@@ -78,46 +83,41 @@
       });
     };
 
-    // Correct signOutAdmin function
     window.signOutAdmin = function () {
       signOut(auth).then(() => {
         localStorage.removeItem("adminEmail");
         localStorage.removeItem("adminProfilePic");
         localStorage.removeItem("adminName");
-        loginButton.disabled = false; // Enable login button after sign-out
+        loginButton.disabled = false;
         window.location.reload();
       }).catch(error => {
         showAlert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
       });
     };
 
-    // Show custom alert messages
     function showAlert(message) {
       const alertDiv = document.createElement("div");
       alertDiv.classList.add("alert-message");
       alertDiv.textContent = message;
       document.body.appendChild(alertDiv);
-      setTimeout(() => {
-        alertDiv.remove();
-      }, 3000);
+      setTimeout(() => alertDiv.remove(), 3000);
     }
 
     window.onload = function () {
       const profilePic = localStorage.getItem("adminProfilePic");
       const name = localStorage.getItem("adminName");
 
-      // Check if user is already logged in
       if (savedAdmin === ADMIN_EMAIL) {
         adminProfile.style.display = "block";
         adminName.textContent = name;
         adminProfilePic.src = profilePic;
         bookingList.style.display = "block";
         renderBookings();
-        loginButton.disabled = true; // Disable login button if user is already logged in
+        loginButton.disabled = true;
       } else {
-        signinDiv.style.display = "block"; // Show login button if not logged in
-        adminProfile.style.display = "none"; // Hide admin profile section
-        bookingList.style.display = "none"; // Hide booking list section
+        signinDiv.style.display = "block";
+        adminProfile.style.display = "none";
+        bookingList.style.display = "none";
       }
     };
   </script>
@@ -125,130 +125,148 @@
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
-      transition: all 0.3s ease-in-out;
-    }
-    h1 {
-      color: #343a40;
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    .alert-message {
-      background-color: #dc3545;
-      color: white;
-      font-size: 1rem;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 8px;
       text-align: center;
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      width: 90%;
-      max-width: 400px;
+      transition: background 0.5s ease-in-out;
     }
-    .alert-message.success {
-      background-color: #28a745;
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
-    ul {
-      background: #fff;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 600px;
-    }
-    button {
-      background-color: #dc3545;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 1rem;
-      width: 100%;
-    }
-    button:hover {
-      background-color: #c82333;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      padding: 10px;
-      background: #fdfdfd;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-    }
+
     #signinDiv {
-      margin-bottom: 20px;
       display: flex;
       justify-content: center;
       width: 100%;
     }
 
-    /* Admin Profile Section */
+    #loginButton {
+      background-color: #ff5733;
+      color: white;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: none;
+      transition: background 0.3s ease-in-out;
+    }
+
+    #loginButton:hover {
+      background-color: #ff6f47;
+    }
+
     #adminProfile {
       display: none;
       text-align: center;
       margin-top: 20px;
     }
+
     #adminProfilePic {
       border-radius: 50%;
       width: 120px;
       height: 120px;
       object-fit: cover;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
     #adminName {
       font-size: 1.5rem;
       margin-top: 10px;
-      color: #343a40;
     }
-    
-    /* Sign Out Button */
+
     .sign-out-btn {
       background-color: #ff073a;
       color: white;
-      font-weight: bold;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 12px 25px;
+      margin-top: 15px;
+      font-size: 1.1rem;
       cursor: pointer;
-      padding: 10px 20px;
-      margin-top: 20px;
       border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s ease-in-out;
     }
 
     .sign-out-btn:hover {
       background-color: #c82333;
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      body {
-        padding: 15px;
-      }
-      h1 {
-        font-size: 1.5rem;
-      }
-      ul {
-        width: 100%;
-      }
+    #bookingList {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 40px;
+      padding: 0;
+    }
+
+    .booking-item {
+      background-color: #222;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .booking-item:hover {
+      transform: scale(1.05);
+    }
+
+    .booking-details {
+      font-size: 1.1rem;
+      color: #f7f7f7;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #ff5733;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      color: #ff6f47;
+    }
+
+    .alert-message {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #dc3545;
+      color: white;
+      font-size: 1.1rem;
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 1000;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      animation: fadeIn 3s forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -265,7 +283,6 @@
     <button class="sign-out-btn" onclick="signOutAdmin()">تسجيل الخروج</button>
   </div>
 
-  <ul id="bookingList" style="display:none;"></ul>
-
+  <ul id="bookingList"></ul>
 </body>
 </html>
