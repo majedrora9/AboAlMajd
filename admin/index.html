@@ -6,121 +6,121 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
 
   <!-- Firebase Libraries (Use type="module") -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
-    authDomain: "aboalmajd-486a6.firebaseapp.com",
-    projectId: "aboalmajd-486a6",
-    storageBucket: "aboalmajd-486a6.firebasestorage.app",
-    messagingSenderId: "725610405729",
-    appId: "1:725610405729:web:0718744134924904baef20",
-    measurementId: "G-RYJ46JS51S"
-  };
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
+      authDomain: "aboalmajd-486a6.firebaseapp.com",
+      projectId: "aboalmajd-486a6",
+      storageBucket: "aboalmajd-486a6.firebasestorage.app",
+      messagingSenderId: "725610405729",
+      appId: "1:725610405729:web:0718744134924904baef20",
+      measurementId: "G-RYJ46JS51S"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  const ADMIN_EMAIL = "majedrora9@gmail.com";
-  const savedAdmin = localStorage.getItem("adminEmail");
-  const bookingList = document.getElementById("bookingList");
-  const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-  const adminProfile = document.getElementById("adminProfile");
-  const adminName = document.getElementById("adminName");
-  const adminProfilePic = document.getElementById("adminProfilePic");
-  const signinDiv = document.getElementById("signinDiv");
-  const loginButton = document.getElementById("loginButton"); // Reference to login button
+    const ADMIN_EMAIL = "majedrora9@gmail.com";
+    const savedAdmin = localStorage.getItem("adminEmail");
+    const bookingList = document.getElementById("bookingList");
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const adminProfile = document.getElementById("adminProfile");
+    const adminName = document.getElementById("adminName");
+    const adminProfilePic = document.getElementById("adminProfilePic");
+    const signinDiv = document.getElementById("signinDiv");
+    const loginButton = document.getElementById("loginButton"); // Reference to login button
 
-  function renderBookings() {
-    bookingList.innerHTML = "";
-    bookings.forEach((b, i) => {
-      const li = document.createElement("li");
-      li.textContent = `${b.name} - ${b.time}`;
-      const btn = document.createElement("button");
-      btn.textContent = "حذف";
-      btn.onclick = () => {
-        bookings.splice(i, 1);
-        localStorage.setItem("bookings", JSON.stringify(bookings));
-        renderBookings();
-      };
-      li.appendChild(btn);
-      bookingList.appendChild(li);
-    });
-  }
+    function renderBookings() {
+      bookingList.innerHTML = "";
+      bookings.forEach((b, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${b.name} - ${b.time}`;
+        const btn = document.createElement("button");
+        btn.textContent = "حذف";
+        btn.onclick = () => {
+          bookings.splice(i, 1);
+          localStorage.setItem("bookings", JSON.stringify(bookings));
+          renderBookings();
+        };
+        li.appendChild(btn);
+        bookingList.appendChild(li);
+      });
+    }
 
-  // Define loginWithGoogle globally
-  window.loginWithGoogle = function () {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider).then(result => {
-      const email = result.user.email;
-      if (email === ADMIN_EMAIL) {
-        localStorage.setItem("adminEmail", email);
-        localStorage.setItem("adminProfilePic", result.user.photoURL);
-        localStorage.setItem("adminName", result.user.displayName);
-        signinDiv.style.display = "none";
+    // Define loginWithGoogle globally
+    window.loginWithGoogle = function () {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider).then(result => {
+        const email = result.user.email;
+        if (email === ADMIN_EMAIL) {
+          localStorage.setItem("adminEmail", email);
+          localStorage.setItem("adminProfilePic", result.user.photoURL);
+          localStorage.setItem("adminName", result.user.displayName);
+          signinDiv.style.display = "none";
+          adminProfile.style.display = "block";
+          adminName.textContent = result.user.displayName;
+          adminProfilePic.src = result.user.photoURL;
+          bookingList.style.display = "block";
+          renderBookings();
+          loginButton.disabled = true; // Disable login button after login
+        } else {
+          showAlert("هذا البريد غير مصرح له بالدخول.");
+          signOut(auth);
+        }
+      }).catch(error => {
+        showAlert("حدث خطأ في تسجيل الدخول: " + error.message);
+      });
+    };
+
+    // Correct signOutAdmin function
+    window.signOutAdmin = function () {
+      signOut(auth).then(() => {
+        localStorage.removeItem("adminEmail");
+        localStorage.removeItem("adminProfilePic");
+        localStorage.removeItem("adminName");
+        loginButton.disabled = false; // Enable login button after sign-out
+        window.location.reload();
+      }).catch(error => {
+        showAlert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
+      });
+    };
+
+    // Show custom alert messages
+    function showAlert(message) {
+      const alertDiv = document.createElement("div");
+      alertDiv.classList.add("alert-message");
+      alertDiv.textContent = message;
+      document.body.appendChild(alertDiv);
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+    }
+
+    window.onload = function () {
+      const profilePic = localStorage.getItem("adminProfilePic");
+      const name = localStorage.getItem("adminName");
+
+      // Check if user is already logged in
+      if (savedAdmin === ADMIN_EMAIL) {
         adminProfile.style.display = "block";
-        adminName.textContent = result.user.displayName;
-        adminProfilePic.src = result.user.photoURL;
+        adminName.textContent = name;
+        adminProfilePic.src = profilePic;
         bookingList.style.display = "block";
         renderBookings();
-        loginButton.disabled = true; // Disable login button after login
+        loginButton.disabled = true; // Disable login button if user is already logged in
       } else {
-        showAlert("هذا البريد غير مصرح له بالدخول.");
-        signOut(auth);
+        signinDiv.style.display = "block"; // Show login button if not logged in
+        adminProfile.style.display = "none"; // Hide admin profile section
+        bookingList.style.display = "none"; // Hide booking list section
+        loginButton.disabled = false; // Ensure login button is enabled if not logged in
       }
-    }).catch(error => {
-      showAlert("حدث خطأ في تسجيل الدخول: " + error.message);
-    });
-  };
-
-  // Correct signOutAdmin function
-  window.signOutAdmin = function () {
-    signOut(auth).then(() => {
-      localStorage.removeItem("adminEmail");
-      localStorage.removeItem("adminProfilePic");
-      localStorage.removeItem("adminName");
-      loginButton.disabled = false; // Enable login button after sign-out
-      window.location.reload();
-    }).catch(error => {
-      showAlert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
-    });
-  };
-
-  // Show custom alert messages
-  function showAlert(message) {
-    const alertDiv = document.createElement("div");
-    alertDiv.classList.add("alert-message");
-    alertDiv.textContent = message;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => {
-      alertDiv.remove();
-    }, 3000);
-  }
-
-  window.onload = function () {
-    const profilePic = localStorage.getItem("adminProfilePic");
-    const name = localStorage.getItem("adminName");
-
-    // Check if user is already logged in
-    if (savedAdmin === ADMIN_EMAIL) {
-      adminProfile.style.display = "block";
-      adminName.textContent = name;
-      adminProfilePic.src = profilePic;
-      bookingList.style.display = "block";
-      renderBookings();
-      loginButton.disabled = true; // Disable login button if user is already logged in
-    } else {
-      signinDiv.style.display = "block"; // Show login button if not logged in
-      adminProfile.style.display = "none"; // Hide admin profile section
-      bookingList.style.display = "none"; // Hide booking list section
-    }
-  };
-</script>
-
+    };
+  </script>
 
   <style>
     body {
