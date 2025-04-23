@@ -1,114 +1,97 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حجز حلاق</title>
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: #f0f8ff;
-      margin: 0;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #222;
-    }
-    h1, h2 {
-      color: #222;
-      margin-bottom: 10px;
-    }
-    form {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 320px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    input, select, button {
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      width: 100%;
-    }
-    button {
-      background-color: #28a745;
-      color: white;
-      transition: background-color 0.3s ease;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    a {
-      margin-top: 20px;
-      color: #007bff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1080">
+    <link rel="stylesheet" href="style.css">
+    <title>الصفحة الرئيسية / حجز موعد</title>
 </head>
+
 <body>
-  <h1>نظام حجز الحلاق</h1>
-  <div id="bookingDiv">
-    <h2>احجز موعدك</h2>
-    <form id="bookingForm">
-      <input type="text" id="name" placeholder="اسمك" required />
-      <select id="time">
-        <option value="">اختر الوقت</option>
-      </select>
-      <button type="submit">احجز</button>
-    </form>
-    <a href="admin.html">الذهاب إلى لوحة الإدارة</a>
-  </div>
-  <script>
-    const bookingForm = document.getElementById("bookingForm");
-    const selectTime = document.getElementById("time");
-    const defaultTimes = [
-      "2:00 مساءً", "3:00 مساءً", "4:00 مساءً",
-      "5:00 مساءً", "6:00 مساءً", "7:00 مساءً", "8:00 مساءً"
-    ];
+    <div data-framer-root class="framer-6erVI framer-l92euf">
+        <header class="framer-1xyoll5" data-framer-name="Header">
+            <div class="framer-1u1wf0a"
+                style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                data-framer-component-type="RichTextContainer">
+                <h1 style="--font-selector:R0Y7Q2Fpcm8tNzAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:50px;--framer-font-weight:700;--framer-letter-spacing:-2.6px;--framer-text-alignment:center;--framer-text-color:rgb(51, 51, 51);direction:rtl"
+                    class="framer-text">أبو المجد</h1>
+            </div>
+            <script>
+                window.onload = function () {
+                    const currentDate = new Date();
+                    const options = {weekday: 'long'};
+                    const dayInArabic = currentDate.toLocaleDateString('ar-EG', options);
 
-    const today = new Date();
-    if (today.getDay() === 1) {
-      bookingForm.innerHTML = "<strong>نأسف، نحن مغلقون يوم الاثنين. لا يمكن قبول الحجوزات.</strong>";
-    } else {
-      function loadAvailableTimes() {
-        const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-        const bookedTimes = bookings.map(b => b.time);
-        const availableTimes = defaultTimes.filter(t => !bookedTimes.includes(t));
-        selectTime.innerHTML = '<option value="">اختر الوقت</option>' +
-          availableTimes.map(t => `<option>${t}</option>`).join('');
-      }
+                    // التحقق إذا كان اليوم هو الإثنين
+                    if (dayInArabic === "الإثنين") {
+                        document.getElementById('dayInArabic').textContent = "نحن نغلق يوم الاثنين";
+                    } else {
+                        const displayText = `حجز موعد ليوم: ${dayInArabic}`;
+                        document.getElementById('dayInArabic').textContent = displayText;
+                    }
+                };
+            </script>
 
-      loadAvailableTimes();
 
-      bookingForm.onsubmit = (e) => {
-        e.preventDefault();
-        const name = document.getElementById("name").value;
-        const time = selectTime.value;
-        if (!time) return alert("يرجى اختيار وقت.");
-        const booking = { name, time };
-        const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-        bookings.push(booking);
-        localStorage.setItem("bookings", JSON.stringify(bookings));
-        alert("تم الحجز بنجاح!");
-        bookingForm.reset();
-        loadAvailableTimes();
-      };
-    }
-  </script>
+            <div class="framer-1ffnq9k"
+                style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                data-framer-component-type="RichTextContainer">
+                <h2 style="--font-selector:R0Y7Q2Fpcm8tNTAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:24px;--framer-font-weight:500;--framer-letter-spacing:-0.5px;--framer-line-height:1.5em;--framer-text-alignment:center;--framer-text-color:rgb(136, 136, 136);direction:rtl"
+                    class="framer-text" id="dayInArabic"></h2>
+            </div>
+
+            <form id="bookingForm" class="framer-16isf8u">
+                <label class="framer-peb0z7">
+                    <div class="framer-1m3anml"
+                        style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                        data-framer-component-type="RichTextContainer">
+                        <p style="--font-selector:R0Y7Q2Fpcm8tNTAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:12px;--framer-font-weight:500;--framer-text-alignment:right;--framer-text-color:rgb(136, 136, 136);direction:rtl"
+                            class="framer-text">الحجز باسم</p>
+                    </div>
+                    <div class="framer-form-text-input framer-form-input-wrapper framer-1i0bek2">
+                        <input type="text" id="name" name="name" placeholder="ادخل اسمك هنا" required
+                            class="framer-form-input framer-form-input-empty" />
+                    </div>
+                </label>
+                <label class="framer-15c1r9">
+                    <div class="framer-1trrwse"
+                        style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                        data-framer-component-type="RichTextContainer">
+                        <p style="--font-selector:SW50ZXItTWVkaXVt;--framer-font-family:&quot;Inter&quot;, &quot;Inter Placeholder&quot;, sans-serif;--framer-font-size:12px;--framer-font-weight:500;--framer-text-color:rgb(136, 136, 136);direction:rtl"
+                            class="framer-text">وقت الحجز</p>
+                    </div>
+                    <div class="framer-form-input-wrapper framer-form-select-wrapper framer-qgyhqo">
+                        <select id="time" name="time" required class="framer-form-input">
+                            <option value disabled selected>اختر وقت...</option>
+                        </select>
+                    </div>
+                </label>
+                <div class="framer-1i29scf-container">
+                    <button type="submit" class="framer-mTPGB framer-1p7xspk framer-v-1p7xspk"
+                        data-framer-name="Default" data-reset="button"
+                        style="background-color:rgb(51, 51, 51);border-bottom-left-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-top-right-radius:10px;height:100%;width:100%;opacity:1"
+                        tabindex="0">
+                        <div class="framer-1ypr2gv"
+                            style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;--extracted-r6o4lv:rgb(255, 255, 255);--framer-link-text-color:rgb(0, 153, 255);--framer-link-text-decoration:underline;transform:none"
+                            data-framer-component-type="RichTextContainer">
+                            <p style="--font-selector:R0Y7Q2Fpcm8tNjAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:14px;--framer-font-weight:600;--framer-text-color:var(--extracted-r6o4lv, rgb(255, 255, 255));direction:rtl"
+                                class="framer-text">حفظ الحجز</p>
+                        </div>
+                    </button>
+                </div>
+            </form>
+            <div class="framer-hy0jd4"
+                style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                data-framer-component-type="RichTextContainer">
+                <h2 style="--font-selector:R0Y7Q2Fpcm8tNTAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:11px;--framer-font-weight:500;--framer-letter-spacing:-0.5px;--framer-line-height:1.5em;--framer-text-alignment:center;--framer-text-color:rgb(255, 71, 71);direction:rtl"
+                    class="framer-text">نغلق يوم الأثنين فقط</h2>
+            </div>
+        </header>
+    </div>
+    <div id="overlay"></div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
