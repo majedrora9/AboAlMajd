@@ -1,18 +1,20 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة الإدارة</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080">
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <title>صفحة الادارة / الاعدادات</title>
+</head>
 
-  <!-- Firebase Libraries -->
+<body>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import {getAuth, GoogleAuthProvider, signInWithPopup, signOut} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyC677JzDCsCzup2l4bxmXH1-aqvCUuToQE",
       authDomain: "aboalmajd-486a6.firebaseapp.com",
@@ -23,7 +25,6 @@
       measurementId: "G-RYJ46JS51S"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
@@ -35,7 +36,52 @@
     const adminName = document.getElementById("adminName");
     const adminProfilePic = document.getElementById("adminProfilePic");
     const signinDiv = document.getElementById("signinDiv");
+    const test50 = document.getElementById("test50");
     const loginButton = document.getElementById("loginButton");
+
+    const availableTimesSelect = document.getElementById("availableTimesSelect");
+    const restoredTimesSelect = document.getElementById("restoredTimesSelect");
+
+    let availableTimes = [
+      "2:00 ظهراً", "2:30 ظهراً", "3:00 عصراً", "3:30 عصراً", "4:00 عصراً", "4:30 عصراً",
+      "5:00 مساءً", "5:30 مساءً", "6:00 مساءً", "6:30 مساءً", "7:00 مساءً", "7:30 مساءً", "8:00 مساءً"
+    ];
+    let restoredTimes = [];
+
+    // دالة للتحقق من الوقت المنقضي
+    function isTimePassed(time) {
+      const now = new Date();
+      const [hourMinute, period] = time.split(' ');
+      const [hour, minute] = hourMinute.split(':').map(Number);
+
+      let hour24 = hour;
+      if (period === 'ظهراً' && hour === 12) hour24 = 0;
+      if (period === 'عصراً' && hour < 12) hour24 += 12;
+      if (period === 'مساءً' && hour < 12) hour24 += 12;
+
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+
+      if (hour24 < currentHour || (hour24 === currentHour && minute < currentMinute)) {
+        return true; // الوقت قد مر
+      }
+
+      return false; // الوقت لم يمر
+    }
+
+    function updateSelectOptions() {
+      availableTimesSelect.innerHTML = '<option value="">اختر وقتاً لإزالته</option>';
+      availableTimes.forEach(time => {
+        if (!isTimePassed(time)) {
+          availableTimesSelect.innerHTML += `<option value="${time}">${time}</option>`;
+        }
+      });
+
+      restoredTimesSelect.innerHTML = '<option value="">اختر وقتاً لإعادته</option>';
+      restoredTimes.forEach(time => {
+        restoredTimesSelect.innerHTML += `<option value="${time}">${time}</option>`;
+      });
+    }
 
     function renderBookings() {
       bookingList.innerHTML = "";
@@ -43,7 +89,11 @@
         const li = document.createElement("li");
         li.classList.add("booking-item");
         li.innerHTML = `
-          <span class="booking-details">${b.name} - ${b.time} - ${b.date}</span>
+          <div class="booking-details">
+            <span class="booking-name">${b.name}</span> 
+            <br>
+            <span class="booking-time">${b.time}</span>
+          </div>
           <button class="delete-btn" onclick="deleteBooking(${i})">
             <span class="material-icons">delete</span>
           </button>
@@ -52,12 +102,49 @@
       });
     }
 
-    // Deleting a booking
-    function deleteBooking(index) {
-      bookings.splice(index, 1);
-      localStorage.setItem("bookings", JSON.stringify(bookings));
-      renderBookings();
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+      loginButton.addEventListener("click", loginWithGoogle);
+
+      window.deleteBooking = function (index) {
+        bookings.splice(index, 1);
+        localStorage.setItem("bookings", JSON.stringify(bookings));
+        renderBookings();
+      };
+
+      document.getElementById("deleteSelectedTimeBtn").addEventListener("click", function () {
+        const selectedTime = availableTimesSelect.value;
+        if (selectedTime) {
+          const index = availableTimes.indexOf(selectedTime);
+          if (index > -1) {
+            availableTimes.splice(index, 1);
+            restoredTimes.push(selectedTime);
+            updateSelectOptions();
+            showAlert("تم حذف الوقت بنجاح.");
+          }
+        } else {
+          showAlert("يرجى اختيار وقت.");
+        }
+      });
+
+      document.getElementById("restoreSelectedTimeBtn").addEventListener("click", function () {
+        const selectedTime = restoredTimesSelect.value;
+        if (selectedTime) {
+          const index = restoredTimes.indexOf(selectedTime);
+          if (index > -1) {
+            restoredTimes.splice(index, 1);
+            availableTimes.push(selectedTime);
+            updateSelectOptions();
+            showAlert("تم إعادة الوقت بنجاح.");
+          }
+        } else {
+          showAlert("يرجى اختيار وقت.");
+        }
+      });
+
+      // إزالة الأوقات المنتهية من القائمة عند تحميل الصفحة
+      availableTimes = availableTimes.filter(time => !isTimePassed(time));
+      updateSelectOptions();
+    });
 
     window.loginWithGoogle = function () {
       const provider = new GoogleAuthProvider();
@@ -73,7 +160,7 @@
           adminProfilePic.src = result.user.photoURL;
           bookingList.style.display = "block";
           renderBookings();
-          loginButton.disabled = true;
+          loginButton.style.display = "none";
         } else {
           showAlert("هذا البريد غير مصرح له بالدخول.");
           signOut(auth);
@@ -88,7 +175,7 @@
         localStorage.removeItem("adminEmail");
         localStorage.removeItem("adminProfilePic");
         localStorage.removeItem("adminName");
-        loginButton.disabled = false;
+        loginButton.style.display = "block";
         window.location.reload();
       }).catch(error => {
         showAlert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
@@ -113,176 +200,143 @@
         adminProfilePic.src = profilePic;
         bookingList.style.display = "block";
         renderBookings();
-        loginButton.disabled = true;
+        loginButton.style.display = "none";
+        signinDiv.style.display = "none";
+        test50.style.display = "none";
       } else {
         signinDiv.style.display = "block";
         adminProfile.style.display = "none";
         bookingList.style.display = "none";
       }
     };
+
   </script>
 
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      color: #fff;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      transition: background 0.5s ease-in-out;
-    }
+  <div data-framer-root class="framer-6erVI framer-l92euf">
+    <header class="framer-1xyoll5" data-framer-name="Header">
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
+      <div class="framer-1u1wf0a" style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+          data-framer-component-type="RichTextContainer">
+          <h1 style="--font-selector:R0Y7Q2Fpcm8tNzAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:50px;--framer-font-weight:700;--framer-letter-spacing:-2.6px;--framer-text-alignment:center;--framer-text-color:rgb(51, 51, 51);direction:rtl"
+              class="framer-text">ادارة الصفحة</h1>
+      </div>
 
-    #signinDiv {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
+      <div id="test50" class="framer-1ffnq9k"
+          style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+          data-framer-component-type="RichTextContainer">
+          <h2 style="--font-selector:R0Y7Q2Fpcm8tNTAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:24px;--framer-font-weight:500;--framer-letter-spacing:-0.5px;--framer-line-height:1.5em;--framer-text-alignment:center;--framer-text-color:rgb(136, 136, 136);direction:rtl"
+              class="framer-text">قم بتسجيل الدخول لرؤية الاعدادات</h2>
+      </div>
+      
+      <div id="signinDiv">
+      <div class="framer-1ffnq9k" style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none" data-framer-component-type="RichTextContainer">
+        <div class="framer-1i29scf-container">
+          <button id="loginButton" class="framer-mTPGB framer-1p7xspk framer-v-1p7xspk" data-framer-name="Default" data-reset="button" style="background-color:rgb(51, 51, 51);border-bottom-left-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-top-right-radius:10px;height:100%;width:100%;opacity:1" tabindex="0">
+            <div class="framer-1ypr2gv" style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;--extracted-r6o4lv:rgb(255, 255, 255);--framer-link-text-color:rgb(0, 153, 255);--framer-link-text-decoration:underline;transform:none" data-framer-component-type="RichTextContainer">
+              <p style="--font-selector:R0Y7Q2Fpcm8tNjAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:14px;--framer-font-weight:600;--framer-text-color:var(--extracted-r6o4lv, rgb(255, 255, 255));direction:rtl" class="framer-text">تسجيل الدخول</p>
+            </div>
+          </button>
+        </div>
+      </div>
+      </div>
 
-    #loginButton {
-      background-color: #ff5733;
-      color: white;
-      font-weight: 600;
-      border-radius: 50px;
-      padding: 15px 30px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border: none;
-      transition: background 0.3s ease-in-out;
-    }
+      <div id="adminProfile">
+        <img id="adminProfilePic" alt="Admin Profile">
+        <p id="adminName"></p>
 
-    #loginButton:hover {
-      background-color: #ff6f47;
-    }
+        <div class="framer-1ffnq9k"
+          style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+          data-framer-component-type="RichTextContainer">
+          <div class="framer-1i29scf-container">
+            <button onclick="signOutAdmin()" class="framer-mTPGB framer-1p7xspk framer-v-1p7xspk"
+              data-framer-name="Default" data-reset="button"
+              style="background-color:rgb(51, 51, 51);border-bottom-left-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-top-right-radius:10px;height:100%;width:100%;opacity:1"
+              tabindex="0">
+              <div class="framer-1ypr2gv"
+                style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;--extracted-r6o4lv:rgb(255, 255, 255);--framer-link-text-color:rgb(0, 153, 255);--framer-link-text-decoration:underline;transform:none"
+                data-framer-component-type="RichTextContainer">
+                <p style="--font-selector:R0Y7Q2Fpcm8tNjAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:14px;--framer-font-weight:600;--framer-text-color:var(--extracted-r6o4lv, rgb(255, 255, 255));direction:rtl"
+                  class="framer-text">تسجيل الخروج</p>
+              </div>
+            </button>
+          </div>
+        </div>
 
-    #adminProfile {
-      display: none;
-      text-align: center;
-      margin-top: 20px;
-    }
+        
+        <ul id="bookingList"></ul>
 
-    #adminProfilePic {
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
 
-    #adminName {
-      font-size: 1.5rem;
-      margin-top: 10px;
-    }
+        <div id="availableTimesSection">
 
-    .sign-out-btn {
-      background-color: #ff073a;
-      color: white;
-      font-weight: 600;
-      border-radius: 30px;
-      padding: 12px 25px;
-      margin-top: 15px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border: none;
-      transition: background 0.3s ease-in-out;
-    }
+          <label class="framer-15c1r9">
+              <div class="framer-1trrwse"
+                  style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                  data-framer-component-type="RichTextContainer">
+                  <p style="--font-selector:SW50ZXItTWVkaXVt;--framer-font-family:&quot;Inter&quot;, &quot;Inter Placeholder&quot;, sans-serif;--framer-font-size:12px;--framer-font-weight:500;--framer-text-color:rgb(136, 136, 136);direction:rtl"
+                      class="framer-text">ازالة اوقات من قائمة الحجز</p>
+              </div>
+              <div class="framer-form-input-wrapper framer-form-select-wrapper framer-qgyhqo">
+                  <select id="availableTimesSelect" name="addstime" required class="framer-form-input">
+                      <option value="">اختر وقت...</option>
+                  </select>
+              </div>
+          </label>
+          <br>
+          <div class="framer-1i29scf-container">
+              <button id="deleteSelectedTimeBtn" class="framer-mTPGB framer-1p7xspk framer-v-1p7xspk"
+                  data-framer-name="Default" data-reset="button"
+                  style="background-color:rgb(51, 51, 51);border-bottom-left-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-top-right-radius:10px;height:100%;width:100%;opacity:1"
+                  tabindex="0">
+                  <div class="framer-1ypr2gv"
+                      style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;--extracted-r6o4lv:rgb(255, 255, 255);--framer-link-text-color:rgb(0, 153, 255);--framer-link-text-decoration:underline;transform:none"
+                      data-framer-component-type="RichTextContainer">
+                      <p style="--font-selector:R0Y7Q2Fpcm8tNjAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:14px;--framer-font-weight:600;--framer-text-color:var(--extracted-r6o4lv, rgb(255, 255, 255));direction:rtl"
+                          class="framer-text">حفظ التغييرات</p>
+                  </div>
+              </button>
+          </div>
+        </div>
 
-    .sign-out-btn:hover {
-      background-color: #c82333;
-    }
+        <div id="restoredTimesSection">
 
-    #bookingList {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      margin-top: 40px;
-      padding: 0;
-    }
+          <label class="framer-15c1r9">
+            <div class="framer-1trrwse"
+                style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;transform:none"
+                data-framer-component-type="RichTextContainer">
+                <p style="--font-selector:SW50ZXItTWVkaXVt;--framer-font-family:&quot;Inter&quot;, &quot;Inter Placeholder&quot;, sans-serif;--framer-font-size:12px;--framer-font-weight:500;--framer-text-color:rgb(136, 136, 136);direction:rtl"
+                    class="framer-text">اعادة اوقات إلى قائمة الحجز</p>
+            </div>
+            <div class="framer-form-input-wrapper framer-form-select-wrapper framer-qgyhqo">
+                <select id="restoredTimesSelect" name="addstime" required class="framer-form-input">
+                    <option value="">اختر وقت...</option>
+                </select>
+            </div>
+          </label>
+          <br>
+          <div class="framer-1i29scf-container">
+            <button id="restoreSelectedTimeBtn" class="framer-mTPGB framer-1p7xspk framer-v-1p7xspk"
+                data-framer-name="Default" data-reset="button"
+                style="background-color:rgb(51, 51, 51);border-bottom-left-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-top-right-radius:10px;height:100%;width:100%;opacity:1"
+                tabindex="0">
+                <div class="framer-1ypr2gv"
+                    style="outline:none;display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;--extracted-r6o4lv:rgb(255, 255, 255);--framer-link-text-color:rgb(0, 153, 255);--framer-link-text-decoration:underline;transform:none"
+                    data-framer-component-type="RichTextContainer">
+                    <p style="--font-selector:R0Y7Q2Fpcm8tNjAw;--framer-font-family:&quot;Cairo&quot;, &quot;Cairo Placeholder&quot;, sans-serif;--framer-font-size:14px;--framer-font-weight:600;--framer-text-color:var(--extracted-r6o4lv, rgb(255, 255, 255));direction:rtl"
+                        class="framer-text">حفظ التغييرات</p>
+                </div>
+            </button>
+          </div>
+        </div>
 
-    .booking-item {
-      background-color: #222;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s ease-in-out;
-    }
 
-    .booking-item:hover {
-      transform: scale(1.05);
-    }
 
-    .booking-details {
-      font-size: 1.1rem;
-      color: #f7f7f7;
-    }
 
-    .delete-btn {
-      background: none;
-      border: none;
-      color: #ff5733;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
 
-    .delete-btn:hover {
-      color: #ff6f47;
-    }
-
-    .alert-message {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #dc3545;
-      color: white;
-      font-size: 1.1rem;
-      padding: 15px;
-      border-radius: 8px;
-      z-index: 1000;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      opacity: 0;
-      animation: fadeIn 3s forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-  </style>
-</head>
-<body>
-  <h1>حجوزات الإدارة</h1>
-
-  <div id="signinDiv">
-    <button id="loginButton" onclick="loginWithGoogle()">تسجيل الدخول باستخدام Google</button>
+        
+        </div>
+    </header>
   </div>
 
-  <div id="adminProfile">
-    <img id="adminProfilePic" alt="Admin Profile">
-    <p id="adminName"></p>
-    <button class="sign-out-btn" onclick="signOutAdmin()">تسجيل الخروج</button>
-  </div>
-
-  <ul id="bookingList"></ul>
 </body>
+
 </html>
